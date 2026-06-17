@@ -1,0 +1,68 @@
+import os
+import re
+from playwright.sync_api import Page, expect
+from pages.login_page import LoginPage
+from pages.logout_page import LogoutPage
+from pages.verejna_zona_page import VerejnaZona
+from pages.sprava_skoly_page import SpravaSkoly
+
+
+username=os.getenv("EPRIHLASKY_RIADITEL_USERNAME")
+password=os.getenv("EPRIHLASKY_RIADITEL_PASSWORD")
+
+
+def test_profil_skoly_ZS(page: Page) -> None:
+    login_page = LoginPage(page)
+    logout_page = LogoutPage(page)
+    verejna_zona = VerejnaZona(page)
+    sprava_skoly = SpravaSkoly(page)
+    login_page.login_as_riaditel(username, password, "910021625")
+    sprava_skoly.click_on_menu_sprava_skoly()
+    page.get_by_text("Prístupné poschodia, toalety").click()
+    page.get_by_text("Bez telocvične").click()
+    page.get_by_text("Multifunkčné vonkajšie ihrisko").click()
+    page.get_by_text("Úroveň 2: Digitálna komuniká").click()
+    page.locator("#radioGroup-ZS_WiFi").get_by_text("Nie").click()
+    page.get_by_role("textbox", name="Krátky popis školy *").fill("testovací popis 1")
+    sprava_skoly.click_on_ulozit_zmeny()
+    expect(page.locator("#sprava-skoly-content")).to_contain_text("Údaje profilu školy boli úspešne uložené")
+    logout_page.logout()
+    verejna_zona.vyhladaj_skolu("Základná škola pre AT", "910021625", "Základné školy")
+    verejna_zona.click_on_profil_skoly()
+    expect(page.locator("#najst-skolu-content")).to_contain_text("Základná škola pre AT, Jalmová 19")
+    expect(page.locator("#najst-skolu-content")).to_contain_text("Jalmová 19, 065 34 Prešov")
+    expect(page.locator("#najst-skolu-content")).to_contain_text("testovací popis 1")
+    expect(page.locator("#najst-skolu-content")).to_contain_text("Prístupné poschodia, toalety a jedáleň")
+    expect(page.locator("#najst-skolu-content")).to_contain_text("Bez telocvične")
+    expect(page.locator("#najst-skolu-content")).to_contain_text("Multifunkčné vonkajšie ihrisko")
+    expect(page.get_by_text("check").first).to_be_visible()
+    expect(page.get_by_text("check").nth(1)).to_be_visible()
+    expect(page.locator(".subcategories > div:nth-child(4) > .material-icons")).to_be_visible()
+    expect(page.locator("div:nth-child(5) > .material-icons")).to_be_visible()
+    expect(page.locator("div:nth-child(6) > .material-icons")).to_be_visible()
+    expect(page.locator("#najst-skolu-content")).to_contain_text("Nie")
+    page.get_by_role("button", name="Zavrieť").click()
+    login_page.login_as_riaditel(username, password, "910021625")
+    sprava_skoly.click_on_menu_sprava_skoly()
+    page.get_by_role("radio", name="Škola neprístupná pre osoby").check()
+    page.get_by_role("radio", name="Viac telocviční").check()
+    page.get_by_role("radio", name="Bez vonkajšieho ihriska").check()
+    page.get_by_role("radio", name="Úroveň 5: Riešenie digitá").check()
+    page.get_by_role("radio", name="Áno").check()
+    page.get_by_role("textbox", name="Krátky popis školy *").fill("testovací popis 2")
+    sprava_skoly.click_on_ulozit_zmeny()
+    expect(page.locator("#sprava-skoly-content")).to_contain_text("Údaje profilu školy boli úspešne uložené")
+    logout_page.logout()
+    verejna_zona.vyhladaj_skolu("Základná škola pre AT", "910021625", "Základné školy")
+    verejna_zona.click_on_profil_skoly()
+    expect(page.locator("#najst-skolu-content")).to_contain_text("Základná škola pre AT, Jalmová 19")
+    expect(page.locator("#najst-skolu-content")).to_contain_text("testovací popis 2")
+    expect(page.locator("#najst-skolu-content")).to_contain_text("Škola neprístupná pre osoby so zníženou mobilitou")
+    expect(page.locator("#najst-skolu-content")).to_contain_text("Viac telocviční")
+    expect(page.locator("#najst-skolu-content")).to_contain_text("Bez vonkajšieho ihriska")
+    expect(page.get_by_text("check").first).to_be_visible()
+    expect(page.get_by_text("check").nth(1)).to_be_visible()
+    expect(page.get_by_text("check").nth(2)).to_be_visible()
+    expect(page.get_by_text("check").nth(3)).to_be_visible()
+    expect(page.get_by_text("check").nth(4)).to_be_visible()
+    expect(page.locator("#najst-skolu-content")).to_contain_text("Áno")
