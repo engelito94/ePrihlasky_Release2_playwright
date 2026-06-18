@@ -24,6 +24,18 @@ def pytest_addoption(parser):
     )
 
 
+@pytest.fixture
+def credentials():
+    return {
+        "riaditel_username": os.getenv("EPRIHLASKY_RIADITEL_USERNAME"),
+        "riaditel_password": os.getenv("EPRIHLASKY_RIADITEL_PASSWORD"),
+        "gmail_primary_user": os.getenv("GMAIL_USERNAME"),
+        "gmail_primary_pw": os.getenv("GMAIL_APP_PASSWORD"),
+        "gmail_secondary_user": os.getenv("GMAIL_SEC_USERNAME"),
+        "gmail_secondary_pw": os.getenv("GMAIL_SEC_APP_PASSWORD"),
+    }
+
+
 @pytest.fixture(scope="session")
 def env(request) -> str:
     return request.config.getoption("--env")
@@ -101,3 +113,24 @@ def screenshot_on_failure(request, page: Page):
             path=f"reports/screenshots/{test_name}_{timestamp}.png",
             full_page=True
         )
+
+@pytest.fixture
+def email_account_picker(credentials):
+    def _pick(current_email: str):
+        primary = credentials["gmail_primary_user"]
+        secondary = credentials["gmail_secondary_user"]
+
+        if current_email == primary:
+            return {
+                "new_email": secondary,
+                "mail_user": secondary,
+                "mail_pw": credentials["gmail_secondary_pw"],
+            }
+
+        return {
+            "new_email": primary,
+            "mail_user": primary,
+            "mail_pw": credentials["gmail_primary_pw"],
+        }
+
+    return _pick

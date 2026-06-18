@@ -1,5 +1,6 @@
 import os
 import re
+import pytest
 from playwright.sync_api import Page, expect
 from pages.login_page import LoginPage
 from pages.logout_page import LogoutPage
@@ -10,6 +11,8 @@ from pages.sprava_skoly_page import SpravaSkoly
 username=os.getenv("EPRIHLASKY_RIADITEL_USERNAME")
 password=os.getenv("EPRIHLASKY_RIADITEL_PASSWORD")
 
+@pytest.mark.spravaSkoly
+@pytest.mark.regression
 def test_profil_skoly_MS(page: Page) -> None:
     login_page = LoginPage(page)
     logout_page = LogoutPage(page)
