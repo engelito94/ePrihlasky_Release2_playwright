@@ -1,3 +1,5 @@
+import re
+from bs4 import BeautifulSoup
 from random import randint
 from datetime import date
 from datetime import datetime
@@ -53,3 +55,25 @@ class Helper:
         if mesiac <= 12:
             return "mužské"
         return "ženské"
+    
+    @staticmethod
+    def cleanup_email_text(text: str) -> str:
+        if text is None:
+            return None
+
+        # 1. extrakcia čistého textu z HTML
+        soup = BeautifulSoup(text, "html.parser")
+        text = soup.get_text(separator=" ", strip=True)
+
+        # 2. odstraň cid:... odkazy
+        text = re.sub(r"\[?cid:[^\s\]]+\]?", "", text)
+
+        # 3. všetky whitespace → jedna medzera
+        text = re.sub(r"\s+", " ", text)
+
+        return text.strip()
+        
+    @staticmethod
+    def inkrementuj_identifikator(identifikator: str) -> str:
+        prefix, number_part = identifikator.rsplit("-", 1)
+        return f"{prefix}-{int(number_part) + 1}"

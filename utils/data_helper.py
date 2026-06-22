@@ -14,18 +14,19 @@ class PersonData:
 def pop_random_person_from_file(file_path: str) -> PersonData:
     path = Path(file_path)
 
-    with path.open("r", encoding="utf-8") as file:
-        lines = [line.strip() for line in file if line.strip()]
+    with path.open("r", encoding="utf-8", newline="") as file:
+        lines = file.readlines()
 
-    if not lines:
+    valid_indexes = [i for i, line in enumerate(lines) if line.strip()]
+
+    if not valid_indexes:
         raise ValueError(f"Súbor '{file_path}' neobsahuje žiadne údaje.")
 
-    random_index = random.randrange(len(lines))
-    selected_line = lines.pop(random_index)
+    selected_index = random.choice(valid_indexes)
+    selected_line = lines.pop(selected_index).rstrip("\r\n")
 
-    with path.open("w", encoding="utf-8") as file:
-        for line in lines:
-            file.write(f"{line}\n")
+    with path.open("w", encoding="utf-8", newline="") as file:
+        file.writelines(lines)
 
     parts = [part.strip() for part in selected_line.split(";")]
 

@@ -52,7 +52,7 @@ class LoginPage(BasePage):
         expect(self.page.locator("#riaditel-home-page")).to_contain_text("Správa prihlášok")
 
     def _wait_for_login_success(self):
-        expect(self.page).to_have_url(re.compile(".*prihlask.*", re.IGNORECASE))
+        expect(self.page).to_have_url(re.compile(".*prihlask.*", re.IGNORECASE), timeout= 35000)
 
     def login_as_zakonny_zastupca(self, username: str, password: str):
         self._open_login_form()

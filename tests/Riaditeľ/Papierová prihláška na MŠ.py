@@ -5,16 +5,17 @@ import utils.data_helper as Data
 from utils.helpers import Helper
 from playwright.sync_api import Page, expect
 from pages.login_page import LoginPage
-from pages.papierova_prihlaska_MS import PapierovaPrihlaskaMS
+from pages.papierova_prihlaska_MS_page import PapierovaPrihlaskaMS
 
 
 username=os.getenv("EPRIHLASKY_RIADITEL_USERNAME")
 password=os.getenv("EPRIHLASKY_RIADITEL_PASSWORD")
-data = Data.pop_random_person_from_file("./data/detiMS.txt")
+
 
 @pytest.mark.regression
-@pytest.mark.profil
-def test_zmena_skoly_profil_riaditela(page: Page) -> None:
+@pytest.mark.prihlaskaRiaditel
+def test_pridanie_papierovej_prihlasky_MS(page: Page) -> None:
+    data = Data.pop_random_person_from_file("./data/detiMS.txt")
     login = LoginPage(page)
     prihlaska = PapierovaPrihlaskaMS(page)
     helper = Helper()
