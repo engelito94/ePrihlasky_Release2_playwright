@@ -16,7 +16,7 @@ class PapierovaPrihlaskaSS:
         self.page.get_by_role("button", name="Ďalej").click()
 
         button = self.page.locator("button.btn-confirm.govuk-button.govuk-button__large.last-focusable")
-        if button.is_visible:
+        if button.is_visible():
             button.click()
             
         self.page.get_by_role("textbox", name="Meno *").fill(meno)
@@ -121,6 +121,7 @@ class PapierovaPrihlaskaSS:
 
     def najdi_prihlasku(self, meno:str, priezvisko:str):
         self.page.get_by_label("Odbor").select_option("2b3813df-fbe6-41ce-be28-0efc6dfaca83")
+        self.page.wait_for_load_state("networkidle")
         self.page.get_by_role("textbox", name="Vyhľadávanie v prihláškach").fill(meno + " " + priezvisko)
         self.page.get_by_role("button", name="Hľadať").click()
 

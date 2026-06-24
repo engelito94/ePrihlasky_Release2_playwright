@@ -145,10 +145,13 @@ class PrihlaskaSS:
         self.page.wait_for_load_state("networkidle")
 
     def vyhladanie_prihlasky(self, meno: str, priezvisko: str):
+        self.page.wait_for_load_state("networkidle") 
         self.page.get_by_label("Kolo").select_option("2")
         self.page.get_by_label("Odbor").select_option("2b3813df-fbe6-41ce-be28-0efc6dfaca83")
-        self.page.get_by_role("textbox", name="Vyhľadávanie v prihláškach").fill(meno + " " + priezvisko)
-        self.page.get_by_role("button", name="Hľadať").click()
+        self.page.wait_for_load_state("networkidle") 
+        self.page.wait_for_timeout(2000)
+        self.page.locator("#fulltext-input").fill(meno + " " + priezvisko)
+        self.page.locator("button.govuk-button.govuk-button__basic.button-search:visible").click()
 
     def click_on_prejst_na_prihlasky(self):
         self.page.get_by_role("button", name="Prejsť na prihlášky").click()

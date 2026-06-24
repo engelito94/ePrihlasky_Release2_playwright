@@ -3,12 +3,15 @@ import os
 import re
 import utils.data_helper as Data
 from utils.helpers import Helper 
+from utils.mail_helper import Mail
 from pages.logout_page import LogoutPage
 from playwright.sync_api import Page, expect
 from pages.login_page import LoginPage
 from pages.prihlaska_SS_page import PrihlaskaSS
+from pages.prilohy_SS_page import PrilohySS
 
-
+mailuser=os.getenv("GMAIL_USERNAME")
+mailpw=os.getenv("GMAIL_APP_PASSWORD")
 username=os.getenv("EPRIHLASKY_ZZ_USERNAME")
 password=os.getenv("EPRIHLASKY_ZZ_PASSWORD")
 username_riad=os.getenv("EPRIHLASKY_RIADITEL_USERNAME")
@@ -17,7 +20,7 @@ password_riad=os.getenv("EPRIHLASKY_RIADITEL_PASSWORD")
 #get_by_role("button", name="Stredná škola pre AT Pridať").nth(4)
 
 @pytest.mark.regression
-def test_prihlaska_na_SS_2kolo(page: Page) -> None:
+def test_prihlaska_na_SS_2_kolo(page: Page) -> None:
     data = Data.pop_random_person_from_file("./data/detiSS.txt")
     helper = Helper()
     login = LoginPage(page)
@@ -119,6 +122,67 @@ def test_prihlaska_na_SS_2kolo(page: Page) -> None:
     logout.logout()
     login.login_as_riaditel(username_riad, password_riad, "910021624")
     prihlaska.vyhladanie_prihlasky(data.meno, data.priezvisko)
-    expect(page.locator("#sub-riaditel-prihlasky")).to_contain_text(data.priezvisko +" "+data.meno)
-    expect(page.locator("#sub-riaditel-prihlasky")).to_contain_text(identifikator)
-    expect(page.locator("#sub-riaditel-prihlasky")).to_contain_text("V spracovaní")
+    expect(page.get_by_text(data.priezvisko+" "+data.meno, exact=True)).to_be_visible()
+    expect(page.get_by_text(identifikator, exact=True)).to_be_visible()
+    expect(page.locator("div[class='sub-container'] div[class='scrollable-middle-area'] div:nth-child(2) div:nth-child(1) div:nth-child(1)")).to_contain_text("V spracovaní")
+
+@pytest.mark.regression
+def test_doplnenie_prilohy_na_SS_2_kolo(page: Page) -> None:
+    helper = Helper()
+    mail = Mail()
+    login = LoginPage(page)
+    logout = LogoutPage(page)
+    priloha = PrilohySS(page)
+    login.login_as_riaditel(username_riad, password_riad, "910021624")
+    priloha.najdi_poslednu_prihlasku()
+    expect(page.locator("#detail-prihlasky-riad-SS-content")).to_contain_text("Elektronicky")
+    meno = page.locator("#dietaMeno").text_content()
+    priezvisko = page.locator("#dietaPriezvisko").text_content()
+    identifikator = page.locator("div.prihlaskaIdentifikator").text_content()
+    datum_narodenia = page.locator("#dietaDatumNarodenia").text_content()
+    priloha.vyziadaj_prilohu_na_poslednej_prihlaske()
+    expect(page.locator("#message-box")).to_contain_text("Žiadosť o doplnenie prílohy bola úspešne odoslaná")
+    expect(page.locator("#detail-prihlasky-riad-SS-content")).to_contain_text("Neúplná")
+    expect(page.locator("#skoly")).to_contain_text("Riaditeľ školy Stredná škola pre AT požadoval ďalšie prílohy.")
+    expect(page.locator("#skoly")).to_contain_text("Čestné vyhlásenie zákonného zástupcu")
+    expect(page.locator("#skoly")).to_contain_text("Žiadam o úpravu alebo doplnenie príloh v prihláške na školu. Detaily v sprievodnom texte: Žiadosť o doplnenie prílohy.")
+    priloha.odvolanie_ziadosti()
+
+    odvolanie_prilohy = mail.get_last_email_text("imap.gmail.com", mailuser, mailpw)
+    odvolanie_prilohy = helper.cleanup_email_text(odvolanie_prilohy)
+    expected = f"Vážený/á pán/pani Mária Bartošová, radi by sme vás informovali, že požiadavka na doloženie dodatočných dokumentov príloh k Vašej prihláške zaevidovanej v portáli Elektronické prihlášky do škôl bola zrušená. Nie je teda potrebné dodatočne nahrávať žiadne ďalšie prílohy k prihláške pre: {meno} {priezvisko} nar. {datum_narodenia} . Ak ste už zadali dokumenty na základe predchádzajúceho odkazu, upozorňujeme, že tento odkaz je už neaktívny. V prípade akýchkoľvek otázok nás neváhajte kontaktovať. S pozdravom Tím elektronických prihlášok MŠVVaM SR Tento email bol generovaný automaticky portálom Elektronické prihlášky do škôl, ktorý je v správe Ministerstva školstva, výskumu, vývoja a mládeže Slovenskej republiky. Neodpovedajte naň.\""
+    assert odvolanie_prilohy == expected
+
+    expect(page.locator("#skoly")).to_contain_text("info Výzva odvolaná")
+    expect(page.locator("#detail-prihlasky-riad-SS-content")).to_contain_text("V spracovaní")
+    priloha.vyziadaj_prilohu_na_poslednej_prihlaske()
+
+    vyziadanie_prilohy = mail.get_last_email_text("imap.gmail.com", mailuser, mailpw)
+    vyziadanie_prilohy = helper.cleanup_email_text(vyziadanie_prilohy)
+    expected = f"Vážený/á pán/pani Mária Bartošová, pri kontrole prihlášky {identifikator} pre školu zlievač pre {meno} {priezvisko} sme zistili, že je potrebné doložiť nasledujúcu prílohu: Čestné vyhlásenie zákonného zástupcu z dôvodu že \" Žiadosť o doplnenie prílohy. \". Prosíme Vás o doplnenie požadovanej prílohy k prihláške. Doplnenie príloh môžete vykonať prostredníctvom portálu Elektronické prihlášky do škôl: Link na prihlásenie Ak ešte nemáte vytvorené konto, zaregistrujte sa prostredníctvom odkazu: Registrovať sa Po registrácii a prihlásení sa dostanete do sekcie Moje prihlášky, kde nájdete možnosť pridať existujúcu prihlášku do svojho konta. Na pridanie prihlášky zadajte tento identifikátor prihlášky: {identifikator} Po pridaní prihlášky do konta budete môcť sledovať jej stav, doplniť požadované prílohy a komunikovať so školou. V prípade, že už konto v portáli máte, prihláste sa a pokračujte podľa pokynov v portáli. S pozdravom Tím elektronických prihlášok MŠVVaM SR Tento email bol generovaný automaticky portálom Elektronické prihlášky do škôl, ktorý je v správe Ministerstva školstva, výskumu, vývoja a mládeže Slovenskej republiky. Neodpovedajte naň."
+    assert vyziadanie_prilohy == expected
+    
+    logout.logout()
+    #nahratie prílohy ZZ
+    login.login_as_zakonny_zastupca(username, password)
+    expect(page.locator("#moje-prihlasky")).to_contain_text("Nahrajte prílohy")
+    expect(page.locator("#moje-prihlasky")).to_contain_text("Nahrajte prílohyRiaditeľ strednej školy požaduje doplnenie príloh. Pridanie prílohy nájdete v stĺpci Akcia.")
+    priloha.nahrat_prilohu()
+    expect(page.locator("#pridat-prilohy")).to_contain_text("Dokumenty ste úspešne nahrali")
+    expect(page.locator("#pridat-prilohy")).to_contain_text("Vaša prihláška bude čoskoro posúdená. Ďakujeme za trpezlivosť.")
+
+    prijatie_prilohy = mail.get_last_email_text("imap.gmail.com", mailuser, mailpw)
+    prijatie_prilohy = helper.cleanup_email_text(prijatie_prilohy)
+    print(prijatie_prilohy)
+    expected = (f"Vážený/á pán/pani/ Mária Bartošová, dovoľujeme si Vás informovať, že k Vašej prihláške do Stredná škola pre AT zlievač pre {meno} {priezvisko}, zaevidovanej v elektronickom portáli prihlášok bola doručená príloha s názvom Čestné vyhlásenie zákonného zástupcu. Doručenú prílohu si prosím starostlivo skontrolujte prihlásením sa na portáli Elektronických prihlášok v detaile prihlášky, alebo v prílohe tohto mailu. Prihlásením sa na portáli zároveň získate aj ďalšie informácie o stave Vašej prihlášky a priebehu jej spracovania. Link na prihlásenie S pozdravom Tím elektronických prihlášok MŠVVaM SR Tento email bol generovaný automaticky portálom Elektronické prihlášky do škôl, ktorý je v správe Ministerstva školstva, výskumu, vývoja a mládeže Slovenskej republiky. Neodpovedajte naň.\"")
+    print (expected)
+    assert prijatie_prilohy == expected
+
+    priloha.click_on_prejst_na_prihlasky()
+    expect(page.locator("#moje-prihlasky")).to_contain_text("Doplnená")
+    logout.logout()
+    #kontrola na SŠ
+    login.login_as_riaditel(username_riad, password_riad, "910021624")
+    priloha.najdi_prihlasku_po_nahrati_prilohy(meno, priezvisko)
+    expect(page.locator("#detail-prihlasky-riad-SS-content")).to_contain_text("Doplnená")
+    expect(page.get_by_text("Priložené dokumenty:")).to_be_visible()

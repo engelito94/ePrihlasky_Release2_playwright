@@ -54,6 +54,9 @@ class LoginPage(BasePage):
     def _wait_for_login_success(self):
         expect(self.page).to_have_url(re.compile(".*prihlask.*", re.IGNORECASE), timeout= 35000)
 
+    def _wait_for_registration(self):
+        expect(self.page).to_have_url(re.compile(".*Overenie-voci-registrom*", re.IGNORECASE), timeout= 35000)
+
     def login_as_zakonny_zastupca(self, username: str, password: str):
         self._open_login_form()
         self._fill_username(username)
@@ -70,3 +73,16 @@ class LoginPage(BasePage):
         self._select_school(school_name)
         self._click_submit_button_riad()
         self._verify_login_success_riad()
+
+    def login_as_rola(self, username: str, password: str):
+        self._open_login_form_riad()
+        self._fill_username(username)
+        self._fill_password(password)
+        self._click_login_button()
+
+    def login_po_registracii(self, username: str, password: str):
+        self._open_login_form()
+        self._fill_username(username)
+        self._fill_password(password)
+        self._click_login_button()
+        self._wait_for_registration()

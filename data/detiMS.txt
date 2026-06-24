@@ -3,7 +3,6 @@ Marco;Rossi;220418/6259
 Giovanni;Esposito;220111/7094
 Matteo;Romano;220203/5803
 Francesco;Ricci;220218/1025
-Andrea;Marino;220205/1863
 Giorgio;Ferrari;220107/4810
 Davide;Greco;220119/8593
 Piotr;Nowak;220406/5270
@@ -58,7 +57,6 @@ Zuzanna;Wójcik;225405/4506
 Olga;Kowalczyk;225426/0492
 Natalia;Kamińska;225208/6892
 Julia;Lewandowska;225310/4062
-Emilia;Zielińska;225301/4984
 Hanna;Szymańska;225314/6159
 Ema;Nováková;225301/9604
 Tereza;Dvořáková;225324/1881

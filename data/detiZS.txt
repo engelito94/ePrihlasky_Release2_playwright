@@ -15,7 +15,6 @@ Quinn;Ellis;205408/8817
 Rosalie;Webster;205317/3386
 Sylvia;Griffin;205201/1742
 Tabitha;Porter;205126/3137
-Valerie;West;205123/0071
 Willa;Barker;205218/8468
 Yara;Stone;205101/4493
 Zara;Holland;205219/1449
