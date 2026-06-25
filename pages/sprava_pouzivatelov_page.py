@@ -5,10 +5,13 @@ class SpravaPouzivatelov:
         self.page = page
 
     def otvor_spravu_pouzivatelov(self):
+        self.page.wait_for_load_state("networkidle")
         self.page.get_by_role("link", name="Správa školy").click()
+        self.page.wait_for_load_state("networkidle")
         self.page.get_by_role("link", name="Správa používateľov").click()
 
     def click_on_pridat_pouzivatela(self):
+        self.page.wait_for_load_state("networkidle")
         self.page.get_by_role("button", name="Pridať používateľa").click()
 
     def pridaj_rolu(self, eduid: str, rola: str): 

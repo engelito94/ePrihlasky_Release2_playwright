@@ -22,6 +22,7 @@ class PrilohySS:
         self.page.get_by_role("button", name="Odoslať").click()
 
     def odvolanie_ziadosti(self):
+        self.page.wait_for_timeout(3000)  #pevný tiemout, kvôli čakaniu na e-mail k odvolaniu
         self.page.get_by_role("button", name="Odvolať žiadosť").click()
         self.page.get_by_role("button", name="Áno, odvolať").click()
 

@@ -32,6 +32,7 @@ class ProfilPage:
     def load_kod(self, kod : str):
         self.page.get_by_role("textbox", name="Overovací kód *").fill(kod)
         self.page.get_by_role("button", name="Overiť").click()
+        self.page.wait_for_load_state("networkidle")
 
     def get_email_riaditela(self) -> str:
         return self.page.locator("#profil-riaditel-mail").text_content()

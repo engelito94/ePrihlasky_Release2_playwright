@@ -29,7 +29,8 @@ class VerejnaZona:
         item = self.page.locator(f'li:has-text("{typ}")')
         item.click()
         classes = item.get_attribute("class") or ""
-        self.page.get_by_role("button", name="Zatvoriť chat")
+        if self.page.get_by_role("button", name="Zatvoriť chat").is_visible():
+            self.page.get_by_role("button", name="Zatvoriť chat").click()
 
         if "navigation-item-active" not in classes:
             item.click()

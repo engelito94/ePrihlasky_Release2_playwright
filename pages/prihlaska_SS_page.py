@@ -149,7 +149,7 @@ class PrihlaskaSS:
         self.page.get_by_label("Kolo").select_option("2")
         self.page.get_by_label("Odbor").select_option("2b3813df-fbe6-41ce-be28-0efc6dfaca83")
         self.page.wait_for_load_state("networkidle") 
-        self.page.wait_for_timeout(2000)
+        self.page.wait_for_timeout(3000)
         self.page.locator("#fulltext-input").fill(meno + " " + priezvisko)
         self.page.locator("button.govuk-button.govuk-button__basic.button-search:visible").click()
 

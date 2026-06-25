@@ -14,10 +14,13 @@ class PapierovaPrihlaskaSS:
         self.page.get_by_role("radio", name="Áno").check()
         self.page.get_by_role("textbox", name="Rodné číslo *").fill(rc)
         self.page.get_by_role("button", name="Ďalej").click()
+        self.page.wait_for_load_state("networkidle")
+        self.page.wait_for_timeout(1000)
 
-        button = self.page.locator("button.btn-confirm.govuk-button.govuk-button__large.last-focusable")
-        if button.is_visible():
-            button.click()
+        if self.page.get_by_text("Pre tohto žiaka už existuje prihláška.", exact=True).is_visible():
+            self.page.locator("button.btn-confirm.govuk-button.govuk-button__large.last-focusable").click()
+            if self.page.locator("button").filter(has_text="Pridať prihlášku").last.is_visible():
+                self.page.locator("button").filter(has_text="Pridať prihlášku").last.click()
             
         self.page.get_by_role("textbox", name="Meno *").fill(meno)
         self.page.get_by_role("textbox", name="Priezvisko *").fill(priezvisko)
@@ -56,8 +59,10 @@ class PapierovaPrihlaskaSS:
         self.page.get_by_role("textbox", name="E-mail").fill("katalontest987@gmail.com")
         self.page.get_by_role("textbox", name="Telefónne číslo *").fill("+421963258741")
         self.page.get_by_role("radio", name="Druhý zákonný zástupca nie je").check()
-        self.page.wait_for_timeout(500)
+        self.page.wait_for_timeout(1000)
         self.page.get_by_role("button", name="Ďalej").click()
+        if self.page.get_by_role("radio", name="Druhý zákonný zástupca nie je").is_visible():
+            self.page.get_by_role("button", name="Ďalej").click()
 
     def step_5_navsteva_ZS(self):
         self.page.get_by_role("textbox", name="EDUID základnej školy *").fill("910021625")

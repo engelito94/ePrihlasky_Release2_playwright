@@ -52,7 +52,12 @@ class PapierovaPrihlaskaZS:
         self.page.get_by_role("textbox", name="Rodné číslo *").fill("650204/9367")
         self.page.get_by_role("textbox", name="Telefónne číslo *").fill("+421966332557")
         self.page.get_by_role("button", name="Ďalej").click()
-        self.page.wait_for_timeout(500)
+        self.page.wait_for_timeout(1000)
+        self.page.wait_for_load_state("networkidle")
+        self.page.get_by_role("button", name="Ďalej").click()
+        if self.page.get_by_role("textbox", name="Telefónne číslo *").is_visible():
+            self.page.get_by_role("button", name="Ďalej").click()
+        self.page.wait_for_timeout(1000)
         self.page.get_by_role("button", name="Ďalej").click()
 
     def step_5_navsteva_ZS(self):

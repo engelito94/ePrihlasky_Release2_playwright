@@ -4,7 +4,6 @@ Giovanni;Esposito;220111/7094
 Matteo;Romano;220203/5803
 Francesco;Ricci;220218/1025
 Giorgio;Ferrari;220107/4810
-Davide;Greco;220119/8593
 Piotr;Nowak;220406/5270
 Jakub;Wójcik;220421/7455
 Krzysztof;Kowalczyk;220322/8170
@@ -29,12 +28,10 @@ Leon;Weber;220211/7588
 Noah;Wagner;220410/1185
 Finn;Becker;220119/1960
 Elias;Hoffmann;220426/5019
-Jonas;Schäfer;220122/1715
 Liam;Koch;220326/2787
 Milan;Hansen;220119/3907
 Anders;Nielsen;220217/2929
 Søren;Jensen;220326/1720
-Mads;Pedersen;220407/0220
 Emil;Andersen;220317/3280
 Oscar;Larsen;220304/1654
 Nils;Bergström;220112/1989
@@ -45,11 +42,9 @@ Giulia;Bianchi;225223/7922
 Sofia;Rossi;225126/5412
 Elena;Esposito;225418/7386
 Martina;Romano;225303/0098
-Francesca;Ricci;225414/8842
 Chiara;Marino;225410/1531
 Anna;Ferrari;225203/4169
 Valentina;Greco;225401/0814
-Giada;Lombardi;225106/0988
 Katarzyna;Nowak;225222/0762
 Alicja;Kowalska;225403/5795
 Maja;Wiśniewska;225118/9072
@@ -65,7 +60,6 @@ Veronika;Kučerová;225417/9807
 Adéla;Veselá;225225/2013
 Nela;Horáková;225313/5225
 Klára;Němcová;225324/5016
-Emma;Fischer;225416/2130
 Lea;Weber;225103/2795
 Hannah;Wagner;225415/8324
 Leni;Becker;225409/8418
@@ -75,7 +69,6 @@ Clara;Koch;225226/9756
 Ida;Hansen;225203/8283
 Astrid;Nielsen;225213/9813
 Freja;Jensen;225324/4081
-Maja;Andersen;225124/8945
 Elsa;Johansson;225312/2366
 Nora;Nilsson;225114/9450
 Alma;Larsson;225312/9274

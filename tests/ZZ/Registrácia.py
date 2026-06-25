@@ -23,5 +23,5 @@ def test_registracia(page: Page, playwright: Playwright) -> None:
     expect(page.locator("#potvrdenie-registracie")).to_contain_text("Potvrdenie registrácie")
     activation_url = mail_client.wait_for_registration_link(token, timeout_seconds=60)
     page.goto(activation_url)
-    page.wait_for_timeout(30000)
+    page.wait_for_timeout(80000)
     login.login_po_registracii(email, user_password)

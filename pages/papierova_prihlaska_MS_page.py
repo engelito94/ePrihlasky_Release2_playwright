@@ -50,8 +50,10 @@ class PapierovaPrihlaskaMS:
         self.page.get_by_role("textbox", name="Rodné číslo *").fill("860201/7842")
         self.page.get_by_role("textbox", name="E-mail").fill("katalontest987@gmail.com")
         self.page.get_by_role("textbox", name="Telefónne číslo *").fill("+421905866541")
-        self.page.wait_for_timeout(500)
+        self.page.wait_for_timeout(1000)
         self.page.get_by_role("button", name="Ďalej").click()
+        if self.page.get_by_role("textbox", name="Telefónne číslo *").is_visible():
+            self.page.get_by_role("button", name="Ďalej").click()
 
     def step_5_prilohy(self):
         self.page.get_by_text("Potvrdenie o zdravotnej spôsobilosti (materská škola) Nenahrané Nenahrané").click()
