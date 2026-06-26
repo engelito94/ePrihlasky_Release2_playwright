@@ -173,9 +173,7 @@ def test_doplnenie_prilohy_na_SS_2_kolo(page: Page) -> None:
 
     prijatie_prilohy = mail.get_last_email_text("imap.gmail.com", mailuser, mailpw)
     prijatie_prilohy = helper.cleanup_email_text(prijatie_prilohy)
-    print(prijatie_prilohy)
     expected = (f"Vážený/á pán/pani/ Mária Bartošová, dovoľujeme si Vás informovať, že k Vašej prihláške do Stredná škola pre AT zlievač pre {meno} {priezvisko}, zaevidovanej v elektronickom portáli prihlášok bola doručená príloha s názvom Čestné vyhlásenie zákonného zástupcu. Doručenú prílohu si prosím starostlivo skontrolujte prihlásením sa na portáli Elektronických prihlášok v detaile prihlášky, alebo v prílohe tohto mailu. Prihlásením sa na portáli zároveň získate aj ďalšie informácie o stave Vašej prihlášky a priebehu jej spracovania. Link na prihlásenie S pozdravom Tím elektronických prihlášok MŠVVaM SR Tento email bol generovaný automaticky portálom Elektronické prihlášky do škôl, ktorý je v správe Ministerstva školstva, výskumu, vývoja a mládeže Slovenskej republiky. Neodpovedajte naň.\"")
-    print (expected)
     assert prijatie_prilohy == expected
 
     priloha.click_on_prejst_na_prihlasky()
