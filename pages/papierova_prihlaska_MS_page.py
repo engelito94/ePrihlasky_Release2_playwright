@@ -13,6 +13,12 @@ class PapierovaPrihlaskaMS:
         self.page.get_by_role("radio", name="Áno").check()
         self.page.get_by_role("textbox", name="Rodné číslo *").fill(rc)
         self.page.get_by_role("button", name="Ďalej").click()
+
+        if self.page.get_by_text("Pre tohto žiaka už existuje prihláška.", exact=True).is_visible():
+            self.page.locator("button.btn-confirm.govuk-button.govuk-button__large.last-focusable").click()
+            if self.page.locator("button").filter(has_text="Pridať prihlášku").last.is_visible():
+                self.page.locator("button").filter(has_text="Pridať prihlášku").last.click()
+                
         self.page.wait_for_load_state("networkidle")
         self.page.get_by_role("textbox", name="Meno *").fill(meno)
         self.page.get_by_role("textbox", name="Priezvisko *").fill(priezvisko)

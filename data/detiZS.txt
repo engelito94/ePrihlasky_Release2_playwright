@@ -15,7 +15,6 @@ Sylvia;Griffin;205201/1742
 Tabitha;Porter;205126/3137
 Willa;Barker;205218/8468
 Yara;Stone;205101/4493
-Zara;Holland;205219/1449
 Alicia;Donovan;205413/4181
 Beatrix;Sutton;205314/7767
 Cora;Wallace;205419/8069
@@ -23,7 +22,6 @@ Delilah;Murray;205303/1475
 Frida;Lawson;205119/2308
 Giselle;Chambers;205105/5754
 Honora;Fletcher;205219/7697
-Iris;Walsh;205120/6212
 Joanna;Frost;205120/6850
 Kendra;Beaumont;205127/7294
 Livia;Mercer;205418/1778
@@ -32,7 +30,6 @@ Naomi;Perry;205414/8426
 Odette;Rowe;205325/2069
 Paulina;Vaughn;205307/9424
 Rhea;Marlowe;205225/8813
-Thea;Atwood;205108/7225
 Vivienne;Dalton;205415/8095
 Winifred;Keller;205127/1948
 Xenia;Palmer;205320/4780

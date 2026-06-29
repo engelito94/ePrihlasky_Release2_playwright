@@ -79,7 +79,8 @@ class PrihlaskaMS:
 
     def vyhladaj_prihlasku(self, meno: str, priezvisko: str):
         self.page.wait_for_load_state("networkidle")
-        self.page.get_by_role("textbox", name="Vyhľadávanie v meno,").fill(meno + " " + priezvisko)
+        #self.page.get_by_role("textbox", name="Vyhľadávanie v meno,").fill(meno + " " + priezvisko)
+        self.page.locator("#fulltext-input").fill(meno + " " + priezvisko)
         self.page.get_by_role("button", name="Hľadať").click()
         self.page.locator("button").filter(has_text="Zobraziť").first.click()
         self.page.wait_for_load_state("networkidle")
