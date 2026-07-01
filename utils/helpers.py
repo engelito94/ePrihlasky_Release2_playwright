@@ -77,3 +77,8 @@ class Helper:
     def inkrementuj_identifikator(identifikator: str) -> str:
         prefix, number_part = identifikator.rsplit("-", 1)
         return f"{prefix}-{int(number_part) + 1}"
+    
+    @staticmethod
+    def dekrementuj_identifikator(identifikator: str) -> str:
+        prefix, number_part = identifikator.rsplit("-", 1)
+        return f"{prefix}-{int(number_part) - 1}"

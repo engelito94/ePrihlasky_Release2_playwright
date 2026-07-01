@@ -73,4 +73,18 @@ class Prijimacky:
         self.page.get_by_role("button", name="Pokračovať").click()
         self.page.get_by_role("button", name="Pokračovať").click()
 
+    def stiahni_pozvanku(self):
+        self.page.get_by_role("button", name="Vybrať").first.click()
+        with self.page.expect_download() as download_info:
+            self.page.locator("a").filter(has_text="Stiahnuť PDF - Pozvánka").last.click()
+        download = download_info.value
+        download.save_as("data/downloads/pozvankaDownloaded.pdf")
+
+    def stiahni_body(self):
+        self.page.get_by_role("button", name="Vybrať").first.click()
+        with self.page.expect_download() as download_info:
+            self.page.locator("a").filter(has_text="Stiahnuť PDF - Správa o bodoch").last.click()
+        download1 = download_info.value
+        download1.save_as("data/downloads/bodyDownloaded.pdf")
+
         

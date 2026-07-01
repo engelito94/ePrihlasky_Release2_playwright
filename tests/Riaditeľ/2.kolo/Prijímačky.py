@@ -91,17 +91,8 @@ def test_prijimacky_odoslanie_sprav(page: Page) -> None:
     prijimacky.click_on_menu_prijimacky()
     prijimacky.zorad_prihlasky()
 
-    page.get_by_role("button", name="Vybrať").first.click()
-    with page.expect_download() as download_info:
-        page.get_by_role("link", name="Stiahnuť PDF - Pozvánka").click()
-    download = download_info.value
-    download.save_as("data/downloads/pozvankaDownloaded.pdf")
-
-    page.get_by_role("button", name="Vybrať").first.click()
-    with page.expect_download() as download1_info:
-        page.get_by_role("link", name="Stiahnuť PDF - Správa o bodoch").click()
-    download1 = download1_info.value
-    download1.save_as("data/downloads/bodyDownloaded.pdf")
+    prijimacky.stiahni_pozvanku()
+    prijimacky.stiahni_body()
 
 
 @pytest.mark.regression
