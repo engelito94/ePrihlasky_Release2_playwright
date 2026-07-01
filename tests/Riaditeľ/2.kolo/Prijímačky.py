@@ -8,7 +8,7 @@ from playwright.sync_api import Page, expect
 from pages.login_page import LoginPage
 from pages.prijimacky_page import Prijimacky
 from pages.prihlaska_SS_page import PrihlaskaSS
-from utils.pdf_helper import compare_pdf_visual, export_pdf_page_for_masks
+from utils.pdf_helper import compare_pdf_visual, compare_pdf_text
 
 
 mailuser=os.getenv("GMAIL_USERNAME")
@@ -96,7 +96,7 @@ def test_prijimacky_odoslanie_sprav(page: Page) -> None:
 
 
 @pytest.mark.regression
-def test_porovnaj_body_pdf():
+def test_porovnaj_body_pdf_vizualne():
     compare_pdf_visual(
         actual_pdf="data/downloads/bodyDownloaded.pdf",
         expected_pdf="data/BodyPredloha.pdf",
@@ -113,9 +113,23 @@ def test_porovnaj_body_pdf():
         zoom=2.0,
     )
 
+@pytest.mark.regression
+def test_porovnaj_body_pdf_textovo():
+    compare_pdf_text(
+        actual_pdf="data/downloads/bodyDownloaded.pdf",
+        expected_pdf="data/BodyPredloha.pdf",
+        name_prefix="body_text",
+        flatten_to_single_line=True,
+        ignore_patterns=[
+            r"(?<=žiak\s)[^\d]+?(?=\d{2}\.\d{2}\.\d{4})",  #meno žiaka
+            r"Mária Bartošová",
+            r"(?<!\d)\d{2}\.\d{2}\.\d{4}(?!\d)",   # dátum narodenia
+            r"(?<=Váš prístupový kód:\s)[A-Za-z0-9]+",  # kód po texte
+        ],
+    )
     
 @pytest.mark.regression
-def test_porovnaj_pozvanka_pdf():
+def test_porovnaj_pozvanka_pdf_vizualne():
     compare_pdf_visual(
         actual_pdf="data/downloads/pozvankaDownloaded.pdf",
         expected_pdf="data/PozvánkaPredloha2kolo.pdf",
@@ -131,4 +145,19 @@ def test_porovnaj_pozvanka_pdf():
         max_diff_pixels=5000,
         name_prefix="pozvanka_pdf",
         zoom=2.0,
+    )
+
+@pytest.mark.regression
+def test_porovnaj_pozvanka_pdf_textovo():
+    compare_pdf_text(
+        actual_pdf="data/downloads/pozvankaDownloaded.pdf",
+        expected_pdf="data/PozvánkaPredloha2kolo.pdf",
+        name_prefix="pozvanka_text",
+        flatten_to_single_line=True,
+        ignore_patterns=[
+            r"(?<=žiaka\s)[^\d]+?(?=\d{2}\.\d{2}\.\d{4})",  #meno Žiaka
+            r"Mária Bartošová",
+            r"(?<!\d)\d{2}\.\d{2}\.\d{4}(?!\d)",   # dátum narodenia
+            r"(?<=Váš prístupový kód:\s)[A-Za-z0-9]+",  # kód po texte
+        ],
     )

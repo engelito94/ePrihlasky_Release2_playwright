@@ -2,8 +2,10 @@ from __future__ import annotations
 
 from io import BytesIO
 from pathlib import Path
+import difflib
 from typing import Dict, Iterable, List, Tuple
 
+import re
 import fitz  # PyMuPDF
 import pytest
 import allure
@@ -163,3 +165,123 @@ def export_pdf_page_for_masks(
 
     image.save(output_path)
     return output_path
+
+def _extract_pdf_text_pages(pdf_path: str | Path, *, sort: bool = True) -> list[str]:
+    pdf_path = Path(pdf_path)
+    doc = fitz.open(str(pdf_path))
+    try:
+        return [page.get_text("text", sort=sort) for page in doc]
+    finally:
+        doc.close()
+
+
+def _normalize_pdf_text(
+    text: str,
+    *,
+    flatten_to_single_line: bool = False,
+) -> str:
+    text = text.replace("\xa0", " ")
+    text = text.replace("\r\n", "\n").replace("\r", "\n")
+
+    if flatten_to_single_line:
+        text = text.replace("\n", " ")
+        text = re.sub(r"\s+", " ", text)
+    else:
+        text = re.sub(r"[ \t]+", " ", text)
+        text = re.sub(r"\n{3,}", "\n\n", text)
+
+    return text.strip()
+
+
+def _apply_ignore_patterns(text: str, ignore_patterns: list[str] | None) -> str:
+    if not ignore_patterns:
+        return text
+
+    for pattern in ignore_patterns:
+        text = re.sub(pattern, "__IGNORED__", text, flags=re.MULTILINE)
+
+    return text
+
+
+def compare_pdf_text(
+    actual_pdf: str | Path,
+    expected_pdf: str | Path,
+    *,
+    ignore_patterns: list[str] | None = None,
+    normalize_whitespace: bool = True,
+    flatten_to_single_line: bool = False,
+    sort_text: bool = True,
+    output_dir: str | Path = "reports/pdf-text-diffs",
+    name_prefix: str = "pdf_text_compare",
+) -> None:
+    actual_pdf = Path(actual_pdf)
+    expected_pdf = Path(expected_pdf)
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    actual_pages = _extract_pdf_text_pages(actual_pdf, sort=sort_text)
+    expected_pages = _extract_pdf_text_pages(expected_pdf, sort=sort_text)
+
+    if len(actual_pages) != len(expected_pages):
+        pytest.fail(
+            f"PDF page count differs. expected={len(expected_pages)}, actual={len(actual_pages)}"
+        )
+
+    diff_found = False
+    all_diffs: list[str] = []
+
+    for page_index, (actual_text, expected_text) in enumerate(zip(actual_pages, expected_pages)):
+        page_no = page_index + 1
+
+        if normalize_whitespace:
+            actual_text = _normalize_pdf_text(actual_text, flatten_to_single_line=flatten_to_single_line,)
+            expected_text = _normalize_pdf_text(expected_text, flatten_to_single_line=flatten_to_single_line,)
+
+        actual_text = _apply_ignore_patterns(actual_text, ignore_patterns)
+        expected_text = _apply_ignore_patterns(expected_text, ignore_patterns)
+
+        if actual_text != expected_text:
+            diff_found = True
+
+            diff_lines = list(
+                difflib.unified_diff(
+                    expected_text.splitlines(),
+                    actual_text.splitlines(),
+                    fromfile=f"expected_page_{page_no}",
+                    tofile=f"actual_page_{page_no}",
+                    lineterm="",
+                )
+            )
+
+            diff_text = "\n".join(diff_lines) if diff_lines else "Texts differ, but no unified diff was produced."
+
+            expected_path = output_dir / f"{name_prefix}_page-{page_no}_expected.txt"
+            actual_path = output_dir / f"{name_prefix}_page-{page_no}_actual.txt"
+            diff_path = output_dir / f"{name_prefix}_page-{page_no}_diff.txt"
+
+            expected_path.write_text(expected_text, encoding="utf-8")
+            actual_path.write_text(actual_text, encoding="utf-8")
+            diff_path.write_text(diff_text, encoding="utf-8")
+
+            allure.attach(
+                expected_text,
+                name=f"expected_text_page_{page_no}",
+                attachment_type=allure.attachment_type.TEXT,
+            )
+            allure.attach(
+                actual_text,
+                name=f"actual_text_page_{page_no}",
+                attachment_type=allure.attachment_type.TEXT,
+            )
+            allure.attach(
+                diff_text,
+                name=f"diff_text_page_{page_no}",
+                attachment_type=allure.attachment_type.TEXT,
+            )
+
+            all_diffs.append(f"Page {page_no} differs.\n{diff_text}")
+
+    if diff_found:
+        summary_path = output_dir / f"{name_prefix}_summary.txt"
+        summary_path.write_text("\n\n".join(all_diffs), encoding="utf-8")
+        pytest.fail(f"PDF text comparison failed. See diff files in: {output_dir}")
