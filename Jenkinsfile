@@ -57,7 +57,7 @@ set GMAIL_APP_PASSWORD=%GMAIL_MAIN_PSW%
 set GMAIL_SEC_USERNAME=%GMAIL_SEC_USR%
 set GMAIL_SEC_APP_PASSWORD=%GMAIL_SEC_PSW%
 
-.venv\\Scripts\\pytest -m spravaSkoly --html=reports\\report.html --self-contained-html
+.venv\\Scripts\\pytest -m spravaSkoly --junitxml=reports\\junit.xml --html=reports\\report.html --self-contained-html
 '''
             }
         }
@@ -65,7 +65,10 @@ set GMAIL_SEC_APP_PASSWORD=%GMAIL_SEC_PSW%
 
     post {
         always {
+            junit allowEmptyResults: true, testResults: 'reports/junit.xml'
+
             archiveArtifacts artifacts: 'reports/**/*', allowEmptyArchive: true
+
             publishHTML(target: [
                 allowMissing: true,
                 alwaysLinkToLastBuild: true,
