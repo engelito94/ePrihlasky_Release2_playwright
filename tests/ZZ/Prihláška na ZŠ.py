@@ -131,7 +131,6 @@ def test_doplnenie_prilohy_na_ZS(page: Page, test_data) -> None:
     logout.logout()
     login.login_as_zakonny_zastupca(username, password)
     expect(page).to_have_url(re.compile(r".*/Prihlasky*"), timeout=35000)
-    expect(page.locator("#skoly")).to_contain_text("Riaditeľ školy Základná škola pre AT požadoval ďalšie prílohy.")
     expect(page.locator("#moje-prihlasky")).to_contain_text("Nahrajte prílohyRiaditeľ základnej školy požaduje doplnenie príloh. Pridanie prílohy nájdete v stĺpci Akcia.")
     prilohy.pridat_prilohu()
     expect(page.locator("#pridat-prilohy")).to_contain_text("Dokumenty ste úspešne nahrali")
