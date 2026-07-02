@@ -39,6 +39,8 @@ if not exist .venv (
         stage('Run tests') {
             steps {
                 bat '''
+if not exist reports mkdir reports
+
 set EPRIHLASKY_TEST_URL=https://test-eprihlasky.iedu.sk/
 set EPRIHLASKY_RIADITEL_USERNAME=%EPRIHLASKY_RIADITEL_USR%
 set EPRIHLASKY_RIADITEL_PASSWORD=%EPRIHLASKY_RIADITEL_PSW%
@@ -64,6 +66,15 @@ set GMAIL_SEC_APP_PASSWORD=%GMAIL_SEC_PSW%
     post {
         always {
             archiveArtifacts artifacts: 'reports/**/*', allowEmptyArchive: true
+            publishHTML(target: [
+                allowMissing: true,
+                alwaysLinkToLastBuild: true,
+                keepAll: true,
+                reportDir: 'reports',
+                reportFiles: 'report.html',
+                reportName: 'Pytest HTML Report',
+                reportTitles: 'Pytest Report'
+            ])
         }
     }
 }
