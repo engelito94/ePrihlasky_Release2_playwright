@@ -26,7 +26,6 @@ Oliver;Stone;100103/9094
 Anton;Donovan;100101/8634
 Vladan;Wallace;100112/9437
 Rastislav;Harrington;100111/5995
-Juraj;Dalton;100111/7876
 Timotej;Keller;100408/7502
 Lukas;Palmer;100305/7682
 Igor;Sinclair;100219/0277

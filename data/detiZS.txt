@@ -71,7 +71,6 @@ Dorian;Perry;200123/4389
 Filip;Rowe;200219/0146
 Robin;Vaughn;200326/4912
 Daniel;Hawthorne;200126/7103
-Marcel;Kendall;200125/3441
 Bastian;Whitman;200214/9468
 Elian;Fleming;200326/7222
 Konrad;Spencer;200203/9787
@@ -103,7 +102,6 @@ Viktória;García;195120/0768
 Wilhelmina;Murphy;195405/8260
 Xénia;Costa;195126/2027
 Yvona;Jensen;195320/2944
-Zora;Bernard;195318/9183
 Adéla;Lefèvre;195124/8992
 Bianka;Bianchi;195115/6812
 Dagmara;Santos;195420/1139
@@ -129,7 +127,6 @@ Zuzana;Mayer;195325/7757
 Amalia;Pavlović;195310/1480
 Bára;Ribeiro;195317/5818
 Cecília;Popescu;195315/5479
-Alena;Novotná;195318/4464
 Berenika;Kowalská;195302/8770
 Carmela;Schmidová;195308/5068
 Dáša;Duboisová;195110/3946
@@ -173,7 +170,6 @@ Renata;Bartošová;195301/5295
 Simona;Kučerová;195419/2911
 Tamina;Procházková;195325/3566
 Ute;Nilssonová;195302/5910
-Viktória;Dvořáková;195320/8873
 Zita;Mayerová;195109/9689
 Amália;Pavlovićová;195102/0346
 Beáta;Ribeirová;195322/9828
@@ -205,7 +201,6 @@ Yuri;Hruška;190413/4529
 Zdeno;Štefánik;190319/8528
 Adam;Rybár;190407/7109
 Bohumil;Kostka;190305/7827
-Cezar;Tkáč;190323/9822
 Dominik;Kohút;190408/6250
 Eduard;Macek;190310/0716
 František;Pavlíček;190405/8530
@@ -232,7 +227,6 @@ Andrej;Kowalski;190310/9582
 Boris;Nowak;190318/2688
 Cyril;Schneider;190320/4083
 Dávid;Müller;190306/2887
-Filip;Rossi;190412/6818
 Gustav;Martínez;190101/7118
 Hugo;Johansson;190406/7209
 Ivan;Andersson;190421/1386
@@ -248,7 +242,6 @@ Samuel;Conti;190312/7347
 Tomáš;García;190109/3821
 Urban;Murphy;190104/1747
 Viktor;Costa;190304/4407
-Wiliam;Jensen;190406/4690
 Xaver;Bernard;190313/5223
 Yuri;Lefèvre;190306/6957
 Zdeno;Bianchi;190125/1209
