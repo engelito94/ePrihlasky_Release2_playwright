@@ -11,8 +11,8 @@ from pages.papierova_prihlaska_ZS_page import PapierovaPrihlaskaZS
 username=os.getenv("EPRIHLASKY_RIADITEL_USERNAME")
 password=os.getenv("EPRIHLASKY_RIADITEL_PASSWORD")
 
-@pytest.mark.regression
-@pytest.mark.prihlaskaRiaditel
+@pytest.mark.regres1kolo
+@pytest.mark.regres2kolo
 def test_pridanie_papierovej_prihlasky_ZS(page: Page) -> None:
     data = Data.pop_random_person_from_file("./data/detiZS.txt")
     login = LoginPage(page)

@@ -7,7 +7,8 @@ from playwright.sync_api import Page
 from pages.verejna_zona_page import VerejnaZona
 
 
-@pytest.mark.regression
+@pytest.mark.regres1kolo
+@pytest.mark.regres2kolo
 def test_kontrola_SS(page: Page, visual_snapshot) -> None:
     page.set_viewport_size({"width": 1920, "height": 1080})
 
@@ -22,7 +23,8 @@ def test_kontrola_SS(page: Page, visual_snapshot) -> None:
         max_diff_pixels=10000
     )
 
-@pytest.mark.regression
+@pytest.mark.regres1kolo
+@pytest.mark.regres2kolo
 def test_kontrola_ZS(page: Page, visual_snapshot) -> None:
     page.set_viewport_size({"width": 1920, "height": 1080})
 
@@ -37,7 +39,8 @@ def test_kontrola_ZS(page: Page, visual_snapshot) -> None:
         max_diff_pixels=10000
     )
 
-@pytest.mark.regression
+@pytest.mark.regres1kolo
+@pytest.mark.regres2kolo
 def test_kontrola_MS(page: Page, visual_snapshot) -> None:
     page.set_viewport_size({"width": 1920, "height": 1080})
 

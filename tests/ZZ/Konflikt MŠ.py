@@ -27,7 +27,8 @@ def test_data():
         "data": data,
     }
 
-@pytest.mark.regression
+@pytest.mark.regres1kolo
+@pytest.mark.regres2kolo
 def test_vytvorenie_konfliktu_na_MŠ(page: Page, test_data) -> None:
     data = test_data["data"]
     helper = Helper()
@@ -60,7 +61,8 @@ def test_vytvorenie_konfliktu_na_MŠ(page: Page, test_data) -> None:
     expect(page).to_have_url(re.compile(r".*/Riaditel.*"), timeout=25000)
     expect(page.locator("#riaditel-home-page")).to_contain_text("Prihlášku pre dieťa ste úspešne pridali.")
 
-@pytest.mark.regression
+@pytest.mark.regres1kolo
+@pytest.mark.regres2kolo
 def test_vyriesenie_konfliktu_na_MS(page: Page, test_data) -> None:
     data = test_data["data"]
     helper = Helper()

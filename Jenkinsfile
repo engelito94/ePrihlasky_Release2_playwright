@@ -6,6 +6,24 @@ pipeline {
         timestamps()
     }
 
+    parameters {
+        choice(
+            name: 'TEST_SUITE',
+            choices: ['regres1kolo', 'regres2kolo'],
+            description: 'Vyber, ktory regresny marker sa ma spustit'
+        )
+        string(
+            name: 'EPRIHLASKY_TEST_URL_PARAM',
+            defaultValue: 'https://test-eprihlasky.iedu.sk/',
+            description: 'Cielova URL pre testy'
+        )
+        booleanParam(
+            name: 'HEADLESS',
+            defaultValue: true,
+            description: 'Spustit testy headless'
+        )
+    }
+
     environment {
         EPRIHLASKY_RIADITEL = credentials('eprihlasky-riaditel')
         EPRIHLASKY_SEC_RIADITEL = credentials('eprihlasky-sec-riaditel')
@@ -38,10 +56,11 @@ if not exist .venv (
 
         stage('Run tests') {
             steps {
-                bat '''
+                bat """
 if not exist reports mkdir reports
 
-set EPRIHLASKY_TEST_URL=https://test-eprihlasky.iedu.sk/
+set EPRIHLASKY_TEST_URL=${params.EPRIHLASKY_TEST_URL_PARAM}
+set HEADLESS=${params.HEADLESS}
 set EPRIHLASKY_RIADITEL_USERNAME=%EPRIHLASKY_RIADITEL_USR%
 set EPRIHLASKY_RIADITEL_PASSWORD=%EPRIHLASKY_RIADITEL_PSW%
 set EPRIHLASKY_SEC_RIADITEL_USERNAME=%EPRIHLASKY_SEC_RIADITEL_USR%
@@ -57,8 +76,8 @@ set GMAIL_APP_PASSWORD=%GMAIL_MAIN_PSW%
 set GMAIL_SEC_USERNAME=%GMAIL_SEC_USR%
 set GMAIL_SEC_APP_PASSWORD=%GMAIL_SEC_PSW%
 
-.venv\\Scripts\\pytest -m spravaSkoly --junitxml=reports\\junit.xml --html=reports\\report.html --self-contained-html
-'''
+.venv\\Scripts\\pytest -m "${params.TEST_SUITE}" --junitxml=reports\\junit.xml --html=reports\\report.html --self-contained-html
+"""
             }
         }
     }

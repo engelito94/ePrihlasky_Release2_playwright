@@ -9,7 +9,8 @@ from pages.registracia_page import Registracia
 
 user_password=os.getenv("EPRIHLASKY_ZZ_PASSWORD")
 
-@pytest.mark.regression
+@pytest.mark.regres1kolo
+@pytest.mark.regres2kolo
 def test_registracia(page: Page, playwright: Playwright) -> None:
     registracia = Registracia(page)
     login = LoginPage(page)

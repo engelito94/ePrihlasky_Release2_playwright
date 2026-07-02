@@ -7,7 +7,7 @@ from pages.odbory_page import Odbory
 riad_username=os.getenv("EPRIHLASKY_SEC_RIADITEL_USERNAME")
 riad_password=os.getenv("EPRIHLASKY_SEC_RIADITEL_PASSWORD")
 
-@pytest.mark.regression
+@pytest.mark.regres2kolo
 def test_otvorenie_a_vymazanie_odboru_2_kolo(page: Page) -> None:
     login = LoginPage(page)
     odbor = Odbory(page)

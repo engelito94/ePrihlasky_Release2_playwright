@@ -12,7 +12,8 @@ admin_password=os.getenv("EPRIHLASKY_ADMIN_PASSWORD")
 spracovatel_username=os.getenv("EPRIHLASKY_SPRACOVATEL_USERNAME")
 spracovatel_password=os.getenv("EPRIHLASKY_SPRACOVATEL_PASSWORD")
 
-@pytest.mark.regression
+@pytest.mark.regres1kolo
+@pytest.mark.regres2kolo
 def test_pridaj_rolu(page: Page) -> None:
     login = LoginPage(page)
     logout = LogoutPage(page)
@@ -40,7 +41,8 @@ def test_pridaj_rolu(page: Page) -> None:
     expect(page.locator("#meno-osoby")).to_contain_text("Dušan Lemo")
     expect(page.locator("#profil-riaditel-typ")).to_contain_text("Administrátor")
 
-@pytest.mark.regression
+@pytest.mark.regres1kolo
+@pytest.mark.regres2kolo
 def test_odstran_rolu(page: Page) -> None:
     login = LoginPage(page)
     logout = LogoutPage(page)

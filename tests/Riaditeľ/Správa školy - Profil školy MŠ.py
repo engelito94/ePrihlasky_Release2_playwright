@@ -12,7 +12,8 @@ username=os.getenv("EPRIHLASKY_RIADITEL_USERNAME")
 password=os.getenv("EPRIHLASKY_RIADITEL_PASSWORD")
 
 @pytest.mark.spravaSkoly
-@pytest.mark.regression
+@pytest.mark.regres1kolo
+@pytest.mark.regres2kolo
 def test_profil_skoly_MS(page: Page) -> None:
     login_page = LoginPage(page)
     logout_page = LogoutPage(page)

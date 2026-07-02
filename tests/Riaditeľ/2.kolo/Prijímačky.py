@@ -20,7 +20,7 @@ password_riad=os.getenv("EPRIHLASKY_RIADITEL_PASSWORD")
 
 #get_by_role("button", name="Stredná škola pre AT Pridať").nth(4)
 
-@pytest.mark.regression
+@pytest.mark.regres2kolo
 def test_prihlaska_na_SS_2_kolo_prijimacky(page: Page) -> None:
     data = Data.pop_random_person_from_file("./data/detiSS.txt")
     login = LoginPage(page)
@@ -42,7 +42,8 @@ def test_prihlaska_na_SS_2_kolo_prijimacky(page: Page) -> None:
     expect(page).to_have_url(re.compile(r".*/Prihlaska-odoslana.*"), timeout=35000)
     expect(page.locator("h1")).to_contain_text("Prihláška bola úspešne odoslaná!")
     
-@pytest.mark.regression
+@pytest.mark.regres2kolo
+@pytest.mark.regres1kolo
 def test_prijimacky_odoslanie_sprav(page: Page) -> None:
     login = LoginPage(page)
     prijimacky = Prijimacky(page)
@@ -95,7 +96,8 @@ def test_prijimacky_odoslanie_sprav(page: Page) -> None:
     prijimacky.stiahni_body()
 
 
-@pytest.mark.regression
+@pytest.mark.regres1kolo
+@pytest.mark.regres2kolo
 def test_porovnaj_body_pdf_vizualne():
     compare_pdf_visual(
         actual_pdf="data/downloads/bodyDownloaded.pdf",
@@ -113,7 +115,8 @@ def test_porovnaj_body_pdf_vizualne():
         zoom=2.0,
     )
 
-@pytest.mark.regression
+@pytest.mark.regres1kolo
+@pytest.mark.regres2kolo
 def test_porovnaj_body_pdf_textovo():
     compare_pdf_text(
         actual_pdf="data/downloads/bodyDownloaded.pdf",
@@ -128,7 +131,8 @@ def test_porovnaj_body_pdf_textovo():
         ],
     )
     
-@pytest.mark.regression
+@pytest.mark.regres1kolo
+@pytest.mark.regres2kolo
 def test_porovnaj_pozvanka_pdf_vizualne():
     compare_pdf_visual(
         actual_pdf="data/downloads/pozvankaDownloaded.pdf",
@@ -147,7 +151,8 @@ def test_porovnaj_pozvanka_pdf_vizualne():
         zoom=2.0,
     )
 
-@pytest.mark.regression
+@pytest.mark.regres2kolo
+@pytest.mark.regres1kolo
 def test_porovnaj_pozvanka_pdf_textovo():
     compare_pdf_text(
         actual_pdf="data/downloads/pozvankaDownloaded.pdf",

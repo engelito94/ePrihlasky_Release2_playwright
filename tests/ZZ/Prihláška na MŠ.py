@@ -25,7 +25,8 @@ def test_data():
         "data": data,
     }
 
-@pytest.mark.regression
+@pytest.mark.regres1kolo
+@pytest.mark.regres2kolo
 def test_prihlaska_na_MS(page: Page, test_data) -> None:
     data = test_data["data"]
     helper = Helper()
@@ -102,7 +103,8 @@ def test_prihlaska_na_MS(page: Page, test_data) -> None:
     expect(page.locator("#dietaRodneCislo")).to_contain_text(data.rodne_cislo)
 
 
-@pytest.mark.regression
+@pytest.mark.regres1kolo
+@pytest.mark.regres2kolo
 def test_doplnenie_prilohy_na_MS(page: Page, test_data) -> None:
     data = test_data["data"]
     helper = Helper()

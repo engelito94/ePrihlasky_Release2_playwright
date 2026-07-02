@@ -12,7 +12,8 @@ password=os.getenv("EPRIHLASKY_ZZ_PASSWORD")
 import re
 from playwright.sync_api import Page, expect
 
-@pytest.mark.regression
+@pytest.mark.regres1kolo
+@pytest.mark.regres2kolo
 def test_zmeny_udajov_ZZ_IFO(page: Page, email_account_picker) -> None:
     helper = Helper()
     mail = Mail()

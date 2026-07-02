@@ -19,7 +19,7 @@ password_riad=os.getenv("EPRIHLASKY_RIADITEL_PASSWORD")
 
 #get_by_role("button", name="Stredná škola pre AT Pridať").nth(4)
 
-@pytest.mark.regression
+@pytest.mark.regres2kolo
 def test_prihlaska_na_SS_2_kolo(page: Page) -> None:
     data = Data.pop_random_person_from_file("./data/detiSS.txt")
     helper = Helper()
@@ -126,7 +126,7 @@ def test_prihlaska_na_SS_2_kolo(page: Page) -> None:
     expect(page.get_by_text(identifikator, exact=True)).to_be_visible()
     expect(page.locator("div[class='sub-container'] div[class='scrollable-middle-area'] div:nth-child(2) div:nth-child(1) div:nth-child(1)")).to_contain_text("V spracovaní")
 
-@pytest.mark.regression
+@pytest.mark.regres2kolo
 def test_doplnenie_prilohy_na_SS_2_kolo(page: Page) -> None:
     helper = Helper()
     mail = Mail()

@@ -21,7 +21,7 @@ mailpw=os.getenv("GMAIL_APP_PASSWORD")
 
 #get_by_role("button", name="Stredná škola pre AT Pridať").nth(4)
 
-@pytest.mark.regression
+@pytest.mark.regres2kolo
 def test_vytvorenie_konfliktu_2_kolo(page: Page) -> None:
     data = Data.pop_random_person_from_file("./data/detiSS.txt")
     helper = Helper()
@@ -62,7 +62,7 @@ def test_vytvorenie_konfliktu_2_kolo(page: Page) -> None:
     prihlaskaRiad.click_on_odoslat_prihlasku()
     expect(page).to_have_url(re.compile(r".*/Riaditel.*"), timeout=35000)
 
-@pytest.mark.regression
+@pytest.mark.regres2kolo
 def test_vyriesenie_konfliktu_2_kolo(page: Page) -> None:
     login = LoginPage(page)
     mail = Mail()

@@ -12,8 +12,8 @@ username=os.getenv("EPRIHLASKY_RIADITEL_USERNAME")
 password=os.getenv("EPRIHLASKY_RIADITEL_PASSWORD")
 
 
-@pytest.mark.regression
-@pytest.mark.prihlaskaRiaditel
+@pytest.mark.regres1kolo
+@pytest.mark.regres2kolo
 def test_pridanie_papierovej_prihlasky_MS(page: Page) -> None:
     data = Data.pop_random_person_from_file("./data/detiMS.txt")
     login = LoginPage(page)
