@@ -43,7 +43,6 @@ def test_prihlaska_na_SS_2_kolo_prijimacky(page: Page) -> None:
     expect(page.locator("h1")).to_contain_text("Prihláška bola úspešne odoslaná!")
     
 @pytest.mark.regres2kolo
-@pytest.mark.regres1kolo
 def test_prijimacky_odoslanie_sprav(page: Page) -> None:
     login = LoginPage(page)
     prijimacky = Prijimacky(page)
