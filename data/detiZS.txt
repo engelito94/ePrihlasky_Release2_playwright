@@ -86,7 +86,6 @@ Evelína;Rossi;195311/8112
 Flora;Martínez;195111/5738
 Gabriela;Johansson;195403/2773
 Hana;Andersson;195407/1449
-Ingrid;Nielsen;195304/3884
 Jana;Hansen;195305/5302
 Klára;Ferreira;195318/9018
 Lenka;Silva;195302/0421
@@ -112,7 +111,6 @@ Helena;Larsen;195320/1195
 Ivana;Leclerc;195114/6890
 Júlia;Madsen;195321/7233
 Karolína;Pereira;195123/9400
-Lívia;Torres;195307/0812
 Maja;Kraus;195415/3212
 Natália;Fischer;195315/2443
 Oriana;Domínguez;195410/8761
@@ -253,7 +251,6 @@ Eduard;Leclerc;190307/8958
 František;Madsen;190308/5338
 Gregor;Pereira;190327/8828
 Herbert;Torres;190424/7477
-Ivo;Kraus;190401/6444
 Ján;Fischer;190316/9345
 Karol;Domínguez;190308/8429
 Leo;Nagy;190326/2163
