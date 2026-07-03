@@ -12,9 +12,11 @@ class PrihlaskaZS:
         self.page.get_by_role("button", name="Pridať", exact=True).click()
 
     def step_1_pridat_dieta(self, meno: str, priezvisko: str, rodne_cislo: str):
+        self.page.wait_for_load_state("networkidle")
         self.page.get_by_role("radio", name="Iné dieťa Pridajte dieťa").check()
         self.page.get_by_role("button", name="Pridať dieťa").click()
-        self.page.get_by_role("radio", name="Áno").check()
+        #self.page.get_by_role("radio", name="Áno").check()
+        self.page.locator("#maDietaRCRadio_option_0").check()
         self.page.get_by_role("textbox", name="Rodné číslo *").fill(rodne_cislo)
         self.page.get_by_role("textbox", name="Krstné meno *").fill(meno)
         self.page.get_by_role("textbox", name="Priezvisko *").fill(priezvisko)

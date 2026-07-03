@@ -10,7 +10,9 @@ class PapierovaPrihlaskaZS:
         #page.locator("#btn-vytvorit-prihlasku").click()
     
     def step_1_osobne_udaje(self, meno:str, priezvisko:str, rc:str):
-        self.page.get_by_role("radio", name="Áno").check()
+        self.page.wait_for_load_state("networkidle")
+        #self.page.get_by_role("radio", name="Áno").check()
+        self.page.locator("#maDietaRCRadio_option_0").check()
         self.page.get_by_role("textbox", name="Rodné číslo *").fill(rc)
         self.page.get_by_role("button", name="Ďalej").click()
         self.page.get_by_role("textbox", name="Meno *").fill(meno)

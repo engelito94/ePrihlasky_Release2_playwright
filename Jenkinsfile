@@ -57,7 +57,9 @@ if not exist .venv (
         stage('Run tests') {
             steps {
                 bat """
+if exist reports\\screenshots rmdir /s /q reports\\screenshots
 if not exist reports mkdir reports
+if not exist reports\\screenshots mkdir reports\\screenshots
 
 set EPRIHLASKY_TEST_URL=${params.EPRIHLASKY_TEST_URL_PARAM}
 set HEADLESS=${params.HEADLESS}

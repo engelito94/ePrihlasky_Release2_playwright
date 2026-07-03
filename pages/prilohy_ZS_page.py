@@ -12,9 +12,9 @@ class PrilohyZS:
         self.page.get_by_role("button", name="Odoslať").click()
 
     def odvolat_ziadost(self):
+        self.page.wait_for_timeout(4000)
         self.page.get_by_role("button", name="Odvolať žiadosť").click()
         self.page.get_by_role("button", name="Áno, odvolať").click()
-        self.page.wait_for_timeout(2000)
 
     def pridat_prilohu(self):
         self.page.get_by_role("link", name="Pridať prílohy").click()

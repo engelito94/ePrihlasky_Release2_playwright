@@ -7,13 +7,17 @@ class PrihlaskaMS:
     def click_on_vytvorit_prihlasku(self):
         self.page.wait_for_load_state("networkidle")
         self.page.get_by_text("Vytvoriť prihlášku").first.click()
+        self.page.wait_for_load_state("networkidle")
         self.page.get_by_role("radio", name="Materská škola Prihlášku môž").check()
         self.page.get_by_role("button", name="Pridať", exact=True).click()
+        self.page.wait_for_load_state("networkidle")
 
     def step_1_pridat_dieta(self, meno: str, priezvisko: str, rc: str):
         self.page.get_by_role("radio", name="Iné dieťa Pridajte dieťa").check()
         self.page.get_by_role("button", name="Pridať dieťa").click()
-        self.page.get_by_role("radio", name="Áno").check()
+        self.page.wait_for_load_state("networkidle")
+        self.page.locator("#maDietaRCRadio_option_0").check()
+        #page.get_by_role("radio", name="Áno").check()
         self.page.get_by_role("textbox", name="Rodné číslo *").fill(rc)
         self.page.get_by_role("textbox", name="Krstné meno *").fill(meno)
         self.page.get_by_role("textbox", name="Priezvisko *").fill(priezvisko)
