@@ -138,7 +138,6 @@ def screenshot_on_failure(request, page: Page):
             attachment_type=allure.attachment_type.TEXT
         )
 
-
 @pytest.fixture
 def email_account_picker(credentials):
     def _pick(current_email: str):

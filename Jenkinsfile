@@ -76,7 +76,7 @@ set GMAIL_APP_PASSWORD=%GMAIL_MAIN_PSW%
 set GMAIL_SEC_USERNAME=%GMAIL_SEC_USR%
 set GMAIL_SEC_APP_PASSWORD=%GMAIL_SEC_PSW%
 
-.venv\\Scripts\\pytest -m "${params.TEST_SUITE}" --junitxml=reports\\junit.xml --html=reports\\report.html --self-contained-html
+.venv\\Scripts\\pytest -m "${params.TEST_SUITE}" --screenshot=only-on-failure --full-page-screenshot --junitxml=reports\\junit.xml --html=reports\\report.html --self-contained-html
 """
             }
         }
