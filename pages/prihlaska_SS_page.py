@@ -59,6 +59,16 @@ class PrihlaskaSS:
         expect(self.page.locator("#vyber-skoly-message-panel")).to_contain_text("Prihlášku môžete podať len na jeden odbor.")
         self.page.get_by_role("button", name="Ďalej").click()
 
+    def step_3_vyber_skoly_1_kolo(self, nazov: str):
+        self.page.get_by_role("textbox", name="Názov školy alebo jej adresa").fill(nazov)
+        self.page.get_by_role("button", name="Hľadať").click()
+        self.page.get_by_role("button", name="Stredná škola pre AT Pridať do prihlášky").nth(3).click()
+        self.page.get_by_role("button", name="Ďalej").click()
+        self.page.get_by_label("Termín prijímacej skúšky").select_option("11")
+        self.page.get_by_role("button", name="Ďalej").click()
+        self.page.get_by_role("button", name="Ďalej").click()
+        self.page.get_by_role("button", name="Mám skontrolované").click()
+
     def step_4_ZZ(self):
         self.page.get_by_role("radio", name="Druhý zákonný zástupca nie je").check()
         self.page.get_by_role("button", name="Ďalej").click()

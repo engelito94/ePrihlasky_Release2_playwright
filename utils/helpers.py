@@ -82,3 +82,13 @@ class Helper:
     def dekrementuj_identifikator(identifikator: str) -> str:
         prefix, number_part = identifikator.rsplit("-", 1)
         return f"{prefix}-{int(number_part) - 1}"
+
+    @staticmethod
+    def normalize_pozvankaBody(text: str) -> str:
+        text = re.sub(
+            r"Váš prístupový kód:\s*.*?\.\s*",
+            "",
+            text,
+            flags=re.DOTALL
+        )
+        return text.strip()

@@ -18,19 +18,21 @@ password=os.getenv("EPRIHLASKY_ZZ_PASSWORD")
 username_riad=os.getenv("EPRIHLASKY_RIADITEL_USERNAME")
 password_riad=os.getenv("EPRIHLASKY_RIADITEL_PASSWORD")
 
-#get_by_role("button", name="Stredná škola pre AT Pridať").nth(4)
+@pytest.fixture(scope="module")
+def person_data():
+    return Data.generate_unique_person(min_age=15, max_age=17)
 
-@pytest.mark.regres2kolo
-def test_prihlaska_na_SS_2_kolo_prijimacky(page: Page) -> None:
-    data = Data.generate_unique_person(min_age=15, max_age=17)
+@pytest.mark.regres1kolo
+def test_prihlaska_na_SS_1_kolo_prijimacky(page: Page, person_data) -> None:
+    data = person_data
     login = LoginPage(page)
     prihlaska = PrihlaskaSS(page)
     login.login_as_zakonny_zastupca(username, password)
-    prihlaska.click_on_vytvorit_prihlasku()
+    prihlaska.click_on_vytvorit_prihlasku_1_kolo()
     prihlaska.pridat_dieta(data.meno, data.priezvisko, data.rodne_cislo)
     prihlaska.step_1_vyber_ziaka()
     prihlaska.step_2_SVVP()
-    prihlaska.step_3_vyber_skoly("pre AT")
+    prihlaska.step_3_vyber_skoly_1_kolo("škola pre AT")
     prihlaska.step_4_ZZ()
     prihlaska.step_5_ziak_navsteva_skoly()
     prihlaska.step_6_znamky()
@@ -42,22 +44,20 @@ def test_prihlaska_na_SS_2_kolo_prijimacky(page: Page) -> None:
     expect(page).to_have_url(re.compile(r".*/Prihlaska-odoslana.*"), timeout=35000)
     expect(page.locator("h1")).to_contain_text("Prihláška bola úspešne odoslaná!")
     
-@pytest.mark.regres2kolo
-def test_prijimacky_odoslanie_sprav(page: Page) -> None:
+@pytest.mark.regres1kolo
+def test_prijimacky_odoslanie_sprav(page: Page, person_data) -> None:
+    data = person_data
     login = LoginPage(page)
     prijimacky = Prijimacky(page)
     mail = Mail()
     helper = Helper()
     login.login_as_riaditel(username_riad,password_riad,"910021624")
-    prijimacky.zmen_kolo_a_odbor()
-    prijimacky.zorad_prihlasky()
-    prijimacky.zobraz_prihlasku_detail()
-    pristupovy_kod, meno, priezvisko, datum_narodenia = prijimacky.get_udaje_dietata()
+    prijimacky.zmen_odbor_1_kolo()
     prijimacky.click_on_menu_sprava_prihlasok()
     prijimacky.click_on_menu_prijimacky()
     prijimacky.zorad_prihlasky()
     prijimacky.click_on_uprava_prihlasky()
-    expect(page.locator("#prij_edit_meno")).to_contain_text(priezvisko +" "+ meno)
+    expect(page.locator("#prij_edit_meno")).to_contain_text(data.priezvisko +" "+ data.meno)
     expect(page.locator("#prij_edit_detaily")).to_contain_text("O4 - zlievač • slovenský • 2285H00")
     prijimacky.nastavenie_terminu_prijimaciek()
     prijimacky.click_on_akcia_odoslat_pozvanky()
@@ -66,13 +66,22 @@ def test_prijimacky_odoslanie_sprav(page: Page) -> None:
 
     pozvanka = mail.get_last_email_text("imap.gmail.com", mailuser, mailpw)
     pozvanka = helper.cleanup_email_text(pozvanka)
-    expected = f"Vážený/á pán/pani Mária Bartošová týmto pozývame žiaka {meno} {priezvisko} {datum_narodenia} na prijímaciu skúšku 1. termín (2.kolo) do odboru vzdelávania 2285H00-zlievač , v škole Stredná škola pre AT, ktorá sa uskutoční dňa 12.10.2026 o 11:30 hod. Miesto: Stredná škola pre AT, 3.E Váš prístupový kód: {pristupovy_kod}. Odporúčame si ho bezpečne uložiť. Predmety prijímacej skúšky Matematika, Slovenský jazyk a literatúra. Dostavte sa na čas a prineste si kružítko. S pozdravom Tím elektronických prihlášok MŠVVaM SR Tento email bol generovaný automaticky portálom Elektronické prihlášky do škôl, ktorý je v správe Ministerstva školstva, výskumu, vývoja a mládeže Slovenskej republiky. Neodpovedajte naň."
+    pozvanka = helper.normalize_pozvankaBody(pozvanka)
+    expected = (
+    f"Vážený/á pán/pani Mária Bartošová týmto pozývame žiaka {data.meno} {data.priezvisko} {helper.rc_to_datum_narodenia(data.rodne_cislo)} "
+    f"na prijímaciu skúšku 1. termín (1.kolo) do odboru vzdelávania 2285H00-zlievač , v škole Stredná škola pre AT, "
+    f"ktorá sa uskutoční dňa 12.10.2026 o 11:30 hod. Miesto: Stredná škola pre AT, 3.E "
+    f"Odporúčame si ho bezpečne uložiť. Predmety prijímacej skúšky Matematika, Slovenský jazyk a literatúra. "
+    f"Dostavte sa na čas a prineste si kružítko. S pozdravom Tím elektronických prihlášok MŠVVaM SR "
+    f"Tento email bol generovaný automaticky portálom Elektronické prihlášky do škôl, ktorý je v správe Ministerstva školstva, výskumu, vývoja a mládeže Slovenskej republiky. Neodpovedajte naň."
+    )
+    expected = helper.normalize_pozvankaBody(expected)
     assert pozvanka == expected
 
     expect(page.locator("#prijimacky-generovanie-spustene")).to_contain_text("Generovanie 1 pozvánok bolo spustené.")
     expect(page.locator("#prijimacky-generovanie-spustene")).to_contain_text("Tento proces môže v závislosti od počtu vybraných pozvánok trvať niekoľko minút až hodín.")
     prijimacky.click_on_spat_na_prijimacky()
-    prijimacky.zmen_kolo_a_odbor()
+    prijimacky.zmen_odbor_1_kolo()
     prijimacky.zorad_prihlasky()
     expect(page.locator("div.riaditel-prijimacky-cell.komunikacia-cell").locator("div").nth(2)).to_be_visible()
     prijimacky.click_on_akcia_plny_pocet_bodov()
@@ -81,21 +90,30 @@ def test_prijimacky_odoslanie_sprav(page: Page) -> None:
 
     plny_pocet = mail.get_last_email_text("imap.gmail.com", mailuser, mailpw)
     plny_pocet = helper.cleanup_email_text(plny_pocet)
-    expected = f"Vážený/á pán/pani Mária Bartošová žiak {meno} {priezvisko} {datum_narodenia} splnil podmienky na dosiahnutie plného počtu bodov z prijímacích skúšok do odboru vzdelávania 2285H00-zlievač , v škole Stredná škola pre AT, ktoré mu boli udelené v systéme. Výsledky prijímacieho konania si môžete pozrieť, keď budú dostupné pod číselným prístupovým kódom, ktorý bol žiakovi pridelený. Váš prístupový kód: {pristupovy_kod}. Odporúčame si ho bezpečne uložiť. Prosím, zapíšte si ho. S pozdravom Tím elektronických prihlášok MŠVVaM SR Tento email bol generovaný automaticky portálom Elektronické prihlášky do škôl, ktorý je v správe Ministerstva školstva, výskumu, vývoja a mládeže Slovenskej republiky. Neodpovedajte naň."
+    plny_pocet = helper.normalize_pozvankaBody(plny_pocet)
+
+    expected = (
+    f"Vážený/á pán/pani Mária Bartošová žiak {data.meno} {data.priezvisko} {helper.rc_to_datum_narodenia(data.rodne_cislo)} "
+    f"splnil podmienky na dosiahnutie plného počtu bodov z prijímacích skúšok do odboru vzdelávania 2285H00-zlievač , "
+    f"v škole Stredná škola pre AT, ktoré mu boli udelené v systéme. "
+    f"Výsledky prijímacieho konania si môžete pozrieť, keď budú dostupné pod číselným prístupovým kódom, ktorý bol žiakovi pridelený. "
+    f"Odporúčame si ho bezpečne uložiť. Prosím, zapíšte si ho. "
+    f"S pozdravom Tím elektronických prihlášok MŠVVaM SR "
+    f"Tento email bol generovaný automaticky portálom Elektronické prihlášky do škôl, ktorý je v správe Ministerstva školstva, výskumu, vývoja a mládeže Slovenskej republiky. Neodpovedajte naň."
+    )
+    expected = helper.normalize_pozvankaBody(expected)
     assert plny_pocet == expected
 
     expect(page.locator("#riaditel-home-page")).to_contain_text("Správa bola úspešne odoslaná")
-
     prijimacky.click_on_menu_sprava_prihlasok()
-    prijimacky.zmen_kolo_a_odbor()
+    prijimacky.zmen_odbor_1_kolo()
     prijimacky.click_on_menu_prijimacky()
     prijimacky.zorad_prihlasky()
 
     prijimacky.stiahni_pozvanku()
     prijimacky.stiahni_body()
 
-
-@pytest.mark.regres2kolo
+@pytest.mark.regres1kolo
 def test_porovnaj_body_pdf_vizualne():
     compare_pdf_visual(
         actual_pdf="data/downloads/bodyDownloaded.pdf",
@@ -113,7 +131,7 @@ def test_porovnaj_body_pdf_vizualne():
         zoom=2.0,
     )
 
-@pytest.mark.regres2kolo
+@pytest.mark.regres1kolo
 def test_porovnaj_body_pdf_textovo():
     compare_pdf_text(
         actual_pdf="data/downloads/bodyDownloaded.pdf",
@@ -128,11 +146,11 @@ def test_porovnaj_body_pdf_textovo():
         ],
     )
     
-@pytest.mark.regres2kolo
+@pytest.mark.regres1kolo
 def test_porovnaj_pozvanka_pdf_vizualne():
     compare_pdf_visual(
         actual_pdf="data/downloads/pozvankaDownloaded.pdf",
-        expected_pdf="data/PozvánkaPredloha2kolo.pdf",
+        expected_pdf="data/PozvánkaPredloha.pdf",
         masks={
             0: [
                 (320, 300, 610, 340),   # meno a priezvisko
@@ -147,11 +165,11 @@ def test_porovnaj_pozvanka_pdf_vizualne():
         zoom=2.0,
     )
 
-@pytest.mark.regres2kolo
+@pytest.mark.regres1kolo
 def test_porovnaj_pozvanka_pdf_textovo():
     compare_pdf_text(
         actual_pdf="data/downloads/pozvankaDownloaded.pdf",
-        expected_pdf="data/PozvánkaPredloha2kolo.pdf",
+        expected_pdf="data/PozvánkaPredloha.pdf",
         name_prefix="pozvanka_text",
         flatten_to_single_line=True,
         ignore_patterns=[
