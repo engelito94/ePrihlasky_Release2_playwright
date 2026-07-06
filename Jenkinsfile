@@ -56,7 +56,8 @@ if not exist .venv (
 
         stage('Run tests') {
             steps {
-                bat """
+                catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
+                    bat """
 if exist reports\\screenshots rmdir /s /q reports\\screenshots
 if not exist reports mkdir reports
 if not exist reports\\screenshots mkdir reports\\screenshots
@@ -80,6 +81,7 @@ set GMAIL_SEC_APP_PASSWORD=%GMAIL_SEC_PSW%
 
 .venv\\Scripts\\pytest -m "${params.TEST_SUITE}" --screenshot=only-on-failure --full-page-screenshot --junitxml=reports\\junit.xml
 """
+                }
             }
         }
     }
@@ -87,7 +89,6 @@ set GMAIL_SEC_APP_PASSWORD=%GMAIL_SEC_PSW%
     post {
         always {
             junit allowEmptyResults: true, testResults: 'reports/junit.xml'
-
             archiveArtifacts artifacts: 'reports/**/*', allowEmptyArchive: true
         }
     }

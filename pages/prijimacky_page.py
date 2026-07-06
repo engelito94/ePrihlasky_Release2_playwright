@@ -15,6 +15,9 @@ class Prijimacky:
         self.page.get_by_label("Kolo").select_option("2")
         self.page.get_by_label("Odbor").select_option("2b3813df-fbe6-41ce-be28-0efc6dfaca83")
 
+    def zmen_odbor_1_kolo(self):
+        self.page.get_by_label("Odbor").select_option("2b3813df-fbe6-41ce-be28-0efc6dfaca83")    
+
     def zorad_prihlasky(self):
         self.page.get_by_role("button", name="Zoradiť podľa: Predvolené").click()
         self.page.get_by_role("radio", name="Podľa dátumu podania (od").check()

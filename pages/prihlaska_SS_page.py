@@ -12,10 +12,17 @@ class PrihlaskaSS:
         self.page.locator("button.btn-pridat.govuk-button:visible").click()
         # self.page.get_by_role("button", name="Pridať", exact=True).click()
 
+    def click_on_vytvorit_prihlasku_1_kolo(self):
+        self.page.wait_for_load_state("networkidle") 
+        self.page.locator("#btn-vytvorit-prihlasku:visible").click()
+        self.page.locator("#modalVytvoritPrihlaskuRadio_option_2").check()
+        self.page.locator("button.btn-pridat.govuk-button:visible").click()
+
     def pridat_dieta(self, meno: str, priezvisko: str, rc: str):
         self.page.get_by_role("radio", name="Iný žiak Pridajte dieťa alebo").check()
         self.page.get_by_role("button", name="Pridať žiaka").click()
-        self.page.get_by_role("radio", name="Áno").check()
+        self.page.locator("#maDietaRCRadio_option_0").check()
+        #self.page.get_by_role("radio", name="Áno").check()
         self.page.get_by_role("textbox", name="Rodné číslo *").fill(rc)
         self.page.get_by_role("textbox", name="Krstné meno *").fill(meno)
         self.page.get_by_role("textbox", name="Priezvisko *").fill(priezvisko)
