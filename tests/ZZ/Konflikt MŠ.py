@@ -20,17 +20,13 @@ mailuser=os.getenv("GMAIL_USERNAME")
 mailpw=os.getenv("GMAIL_APP_PASSWORD")
 
 @pytest.fixture(scope="module")
-def test_data():
-    data = Data.pop_random_person_from_file("./data/detiMS.txt")
-
-    return {
-        "data": data,
-    }
+def person_data():
+    return Data.generate_unique_person(min_age=4, max_age=5)
 
 @pytest.mark.regres1kolo
 @pytest.mark.regres2kolo
-def test_vytvorenie_konfliktu_na_MŠ(page: Page, test_data) -> None:
-    data = test_data["data"]
+def test_vytvorenie_konfliktu_na_MŠ(page: Page, person_data) -> None:
+    data = person_data
     helper = Helper()
     login = LoginPage(page)
     logout = LogoutPage(page)
@@ -63,8 +59,8 @@ def test_vytvorenie_konfliktu_na_MŠ(page: Page, test_data) -> None:
 
 @pytest.mark.regres1kolo
 @pytest.mark.regres2kolo
-def test_vyriesenie_konfliktu_na_MS(page: Page, test_data) -> None:
-    data = test_data["data"]
+def test_vyriesenie_konfliktu_na_MS(page: Page, person_data) -> None:
+    data = person_data
     helper = Helper()
     mail = Mail()
     login = LoginPage(page)

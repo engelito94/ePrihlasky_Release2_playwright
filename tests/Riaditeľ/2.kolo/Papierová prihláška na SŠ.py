@@ -12,7 +12,7 @@ password=os.getenv("EPRIHLASKY_RIADITEL_PASSWORD")
 
 @pytest.mark.regres2kolo
 def test_pridanie_papierovej_prihlasky_SS(page: Page) -> None:
-    data = Data.pop_random_person_from_file("./data/detiSS.txt")
+    data = Data.generate_unique_person(min_age=15, max_age=17)
     login = LoginPage(page)
     prihlaska = PapierovaPrihlaskaSS(page)
     helper = Helper()

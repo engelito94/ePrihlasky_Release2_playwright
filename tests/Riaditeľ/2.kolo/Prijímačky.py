@@ -22,7 +22,7 @@ password_riad=os.getenv("EPRIHLASKY_RIADITEL_PASSWORD")
 
 @pytest.mark.regres2kolo
 def test_prihlaska_na_SS_2_kolo_prijimacky(page: Page) -> None:
-    data = Data.pop_random_person_from_file("./data/detiSS.txt")
+    data = Data.generate_unique_person(min_age=15, max_age=17)
     login = LoginPage(page)
     prihlaska = PrihlaskaSS(page)
     login.login_as_zakonny_zastupca(username, password)

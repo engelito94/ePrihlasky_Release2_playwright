@@ -18,17 +18,13 @@ username_riad=os.getenv("EPRIHLASKY_RIADITEL_USERNAME")
 password_riad=os.getenv("EPRIHLASKY_RIADITEL_PASSWORD")
 
 @pytest.fixture(scope="module")
-def test_data():
-    data = Data.pop_random_person_from_file("./data/detiMS.txt")
-
-    return {
-        "data": data,
-    }
+def person_data():
+    return Data.generate_unique_person(min_age=4, max_age=5)
 
 @pytest.mark.regres1kolo
 @pytest.mark.regres2kolo
-def test_prihlaska_na_MS(page: Page, test_data) -> None:
-    data = test_data["data"]
+def test_prihlaska_na_MS(page: Page, person_data) -> None:
+    data = person_data
     helper = Helper()
     login = LoginPage(page)
     logout = LogoutPage(page)
@@ -105,8 +101,8 @@ def test_prihlaska_na_MS(page: Page, test_data) -> None:
 
 @pytest.mark.regres1kolo
 @pytest.mark.regres2kolo
-def test_doplnenie_prilohy_na_MS(page: Page, test_data) -> None:
-    data = test_data["data"]
+def test_doplnenie_prilohy_na_MS(page: Page, person_data) -> None:
+    data = person_data
     helper = Helper()
     mail = Mail()
     login = LoginPage(page)

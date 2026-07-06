@@ -19,11 +19,13 @@ password_riad=os.getenv("EPRIHLASKY_RIADITEL_PASSWORD")
 mailuser=os.getenv("GMAIL_USERNAME")
 mailpw=os.getenv("GMAIL_APP_PASSWORD")
 
-#get_by_role("button", name="Stredná škola pre AT Pridať").nth(4)
+@pytest.fixture(scope="module")
+def person_data():
+    return Data.generate_unique_person(min_age=15, max_age=17)
 
 @pytest.mark.regres2kolo
-def test_vytvorenie_konfliktu_2_kolo(page: Page) -> None:
-    data = Data.pop_random_person_from_file("./data/detiSS.txt")
+def test_vytvorenie_konfliktu_2_kolo(page: Page, person_data) -> None:
+    data = person_data
     helper = Helper()
     login = LoginPage(page)
     logout = LogoutPage(page)

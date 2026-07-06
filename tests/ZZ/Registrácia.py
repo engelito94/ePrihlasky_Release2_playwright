@@ -9,6 +9,7 @@ from pages.registracia_page import Registracia
 
 user_password=os.getenv("EPRIHLASKY_ZZ_PASSWORD")
 
+
 @pytest.mark.regres1kolo
 @pytest.mark.regres2kolo
 def test_registracia(page: Page, playwright: Playwright) -> None:
@@ -16,7 +17,7 @@ def test_registracia(page: Page, playwright: Playwright) -> None:
     login = LoginPage(page)
     mail_client = MailTmClient(playwright)
     email, token = mail_client.create_temp_mailbox()
-    data = Data.pop_random_person_from_file("./data/osoba.txt")
+    data = Data.generate_unique_person(min_age=25, max_age=55)
     registracia.click_on_registracia()
     expect(page.locator("#step-1")).to_contain_text("Registrácia")
     expect(page.locator("#step-1-panel-container")).to_contain_text("Registráciu vytvára zákonný zástupca dieťaťaPri registrácii vyplňte údaje zákonného zástupcu (nie dieťaťa), ktorý bude prihlášku podávať.")

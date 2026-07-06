@@ -17,11 +17,13 @@ password=os.getenv("EPRIHLASKY_ZZ_PASSWORD")
 username_riad=os.getenv("EPRIHLASKY_RIADITEL_USERNAME")
 password_riad=os.getenv("EPRIHLASKY_RIADITEL_PASSWORD")
 
-#get_by_role("button", name="Stredná škola pre AT Pridať").nth(4)
+@pytest.fixture(scope="module")
+def person_data():
+    return Data.generate_unique_person(min_age=15, max_age=17)
 
 @pytest.mark.regres2kolo
-def test_prihlaska_na_SS_2_kolo(page: Page) -> None:
-    data = Data.pop_random_person_from_file("./data/detiSS.txt")
+def test_prihlaska_na_SS_2_kolo(page: Page, person_data) -> None:
+    data = person_data
     helper = Helper()
     login = LoginPage(page)
     logout = LogoutPage(page)
