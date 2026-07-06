@@ -5,14 +5,14 @@ class PrilohyMS:
         self.page = page
 
     def vyziadanie_prilohy_MS(self):
-        self.page.wait_for_timeout(2000)
+        self.page.wait_for_timeout(3000)
         self.page.get_by_role("button", name="Vyžiadať prílohu").click()
         self.page.get_by_label("Typ prílohy").select_option("1")
         self.page.get_by_role("textbox", name="Dôvod: *").fill("Odvolanie prílohy.")
         self.page.get_by_role("button", name="Odoslať").click()
 
     def odvolanie_prilohy_MS(self):
-        self.page.wait_for_timeout(3000)
+        self.page.wait_for_timeout(5000)
         self.page.get_by_role("button", name="Odvolať žiadosť").click()
         self.page.get_by_role("button", name="Áno, odvolať").click()
 

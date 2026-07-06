@@ -78,7 +78,7 @@ set GMAIL_APP_PASSWORD=%GMAIL_MAIN_PSW%
 set GMAIL_SEC_USERNAME=%GMAIL_SEC_USR%
 set GMAIL_SEC_APP_PASSWORD=%GMAIL_SEC_PSW%
 
-.venv\\Scripts\\pytest -m "${params.TEST_SUITE}" --screenshot=only-on-failure --full-page-screenshot --junitxml=reports\\junit.xml --html=reports\\report.html --self-contained-html
+.venv\\Scripts\\pytest -m "${params.TEST_SUITE}" --screenshot=only-on-failure --full-page-screenshot --junitxml=reports\\junit.xml
 """
             }
         }
@@ -89,16 +89,6 @@ set GMAIL_SEC_APP_PASSWORD=%GMAIL_SEC_PSW%
             junit allowEmptyResults: true, testResults: 'reports/junit.xml'
 
             archiveArtifacts artifacts: 'reports/**/*', allowEmptyArchive: true
-
-            publishHTML(target: [
-                allowMissing: true,
-                alwaysLinkToLastBuild: true,
-                keepAll: true,
-                reportDir: 'reports',
-                reportFiles: 'report.html',
-                reportName: 'Pytest HTML Report',
-                reportTitles: 'Pytest Report'
-            ])
         }
     }
 }

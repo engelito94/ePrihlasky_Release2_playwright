@@ -6,13 +6,14 @@ class PrilohyZS:
         self.page = page
 
     def vyziadat_prilohu(self, dovod: str):
+        self.page.wait_for_timeout(3000)
         self.page.get_by_role("button", name="Vyžiadať prílohu").click()
         self.page.get_by_label("Typ prílohy").select_option("3")
         self.page.get_by_role("textbox", name="Dôvod: *").fill(dovod)
         self.page.get_by_role("button", name="Odoslať").click()
 
     def odvolat_ziadost(self):
-        self.page.wait_for_timeout(4000)
+        self.page.wait_for_timeout(5000)
         self.page.get_by_role("button", name="Odvolať žiadosť").click()
         self.page.get_by_role("button", name="Áno, odvolať").click()
 
