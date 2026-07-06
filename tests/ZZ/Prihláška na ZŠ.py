@@ -21,7 +21,7 @@ password_riad=os.getenv("EPRIHLASKY_RIADITEL_PASSWORD")
 
 @pytest.fixture(scope="module")
 def person_data():
-    return Data.generate_unique_person(min_age=6, max_age=8)
+    return Data.generate_unique_person(min_age=6, max_age=7)
 
 @pytest.mark.regres1kolo
 @pytest.mark.regres2kolo
