@@ -33,6 +33,7 @@ class ProfilPage:
         self.page.get_by_role("textbox", name="Overovací kód *").fill(kod)
         self.page.get_by_role("button", name="Overiť").click()
         self.page.wait_for_load_state("networkidle")
+        self.page.wait_for_timeout(5000)
 
     def get_email_riaditela(self) -> str:
         return self.page.locator("#profil-riaditel-mail").text_content()

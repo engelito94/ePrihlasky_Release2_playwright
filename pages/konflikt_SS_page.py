@@ -15,6 +15,16 @@ class KofliktSS:
         self.page.get_by_role("button", name="Zobraziť").nth(1).click()
         self.page.wait_for_load_state("networkidle")
 
+    def najdi_prihlasku_v_konflikte_1_kolo(self):
+        self.page.wait_for_load_state("networkidle")
+        self.page.get_by_label("Odbor").select_option("fa97e1ee-cf77-4880-853a-5972261cdb4c") 
+        self.page.get_by_role("button", name="Zoradiť podľa: Predvolené").click()
+        self.page.get_by_role("radio", name="Podľa dátumu podania (od").check()
+        self.page.get_by_role("button", name="Zoradiť prihlášky").click()
+        self.page.wait_for_load_state("networkidle")
+        self.page.get_by_role("button", name="Zobraziť").nth(1).click()
+        self.page.wait_for_load_state("networkidle")
+
     def click_on_vyzva_na_vyriesenie_konfliktu(self):
         self.page.get_by_role("button", name="Vyzvať na riešenie konfliktu").click()
 

@@ -9,6 +9,10 @@ class PapierovaPrihlaskaSS:
         self.page.get_by_label("Kolo").select_option("2")
         self.page.wait_for_load_state("networkidle")
         self.page.locator("#btn-vytvorit-prihlasku").click()
+
+    def click_on_pridaj_prihlasku_1_kolo(self):
+        self.page.wait_for_load_state("networkidle")
+        self.page.locator("#btn-vytvorit-prihlasku").click()
     
     def step_1_osobne_udaje(self, meno:str, priezvisko:str, rc:str):
         #self.page.get_by_role("radio", name="Áno").check()
@@ -49,6 +53,13 @@ class PapierovaPrihlaskaSS:
     def step_3_vyber_skoly(self):
         self.page.get_by_role("link", name="Pridať odbor mojej školy").click()
         self.page.get_by_role("button", name="Pridať do prihlášky").first.click()
+        self.page.get_by_role("button", name="Pridať odbory a odísť").click()
+        self.page.get_by_role("button", name="Ďalej").click()
+        self.page.get_by_role("button", name="Ďalej").click()
+
+    def step_3_vyber_skoly_1_kolo(self):
+        self.page.get_by_role("link", name="Pridať odbor mojej školy").click()
+        self.page.get_by_role("button", name="Pridať do prihlášky").nth(1).click()
         self.page.get_by_role("button", name="Pridať odbory a odísť").click()
         self.page.get_by_role("button", name="Ďalej").click()
         self.page.get_by_role("button", name="Ďalej").click()
@@ -127,6 +138,12 @@ class PapierovaPrihlaskaSS:
 
     def najdi_prihlasku(self, meno:str, priezvisko:str):
         self.page.get_by_label("Odbor").select_option("2b3813df-fbe6-41ce-be28-0efc6dfaca83")
+        self.page.wait_for_load_state("networkidle")
+        self.page.get_by_role("textbox", name="Vyhľadávanie v prihláškach").fill(meno + " " + priezvisko)
+        self.page.get_by_role("button", name="Hľadať").click()
+
+    def najdi_prihlasku(self, meno:str, priezvisko:str):
+        self.page.get_by_label("Odbor").select_option("fa97e1ee-cf77-4880-853a-5972261cdb4c") 
         self.page.wait_for_load_state("networkidle")
         self.page.get_by_role("textbox", name="Vyhľadávanie v prihláškach").fill(meno + " " + priezvisko)
         self.page.get_by_role("button", name="Hľadať").click()

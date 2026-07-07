@@ -170,5 +170,13 @@ class PrihlaskaSS:
         self.page.locator("#fulltext-input").fill(meno + " " + priezvisko)
         self.page.locator("button.govuk-button.govuk-button__basic.button-search:visible").click()
 
+    def vyhladanie_prihlasky_1_kolo(self, meno: str, priezvisko: str):
+        self.page.wait_for_load_state("networkidle") 
+        self.page.get_by_label("Odbor").select_option("fa97e1ee-cf77-4880-853a-5972261cdb4c") 
+        self.page.wait_for_load_state("networkidle") 
+        self.page.wait_for_timeout(3000)
+        self.page.locator("#fulltext-input").fill(meno + " " + priezvisko)
+        self.page.locator("button.govuk-button.govuk-button__basic.button-search:visible").click()
+
     def click_on_prejst_na_prihlasky(self):
         self.page.get_by_role("button", name="Prejsť na prihlášky").click()
