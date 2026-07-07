@@ -1,4 +1,5 @@
 import os
+import re
 import pytest
 from playwright.sync_api import Page, expect
 from pages.login_page import LoginPage
@@ -25,3 +26,15 @@ def test_otvorenie_a_vymazanie_odboru_2_kolo(page: Page) -> None:
     expect(page.locator("body")).to_contain_text("Zverejnenie odborov")
     expect(page.locator("body")).to_contain_text("Chystáte sa zverejniť odbory. Zverejnením umožníte podávať prihlášky na odbory. Odbory po zverejnení nebude možné zmeniť.")
     odbor.odstran_odbor()
+
+@pytest.mark.regres1kolo
+def test_pridanie_a_vymazanie_odboru_1_kolo(page: Page) -> None:
+    login = LoginPage(page)
+    odbor = Odbory(page)
+    login.login_as_riaditel(riad_username, riad_password, "910014291")
+    odbor.pridaj_odbor_1_kolo()
+    expect(page.locator("#message-box")).to_contain_text("Odbory boli úspešne pridané")
+    odbor.aktualizuj_odbory_1_kolo()
+    expect(page.locator("#message-box")).to_contain_text("Odbory boli úspešne aktualizované")
+    odbor.odstran_odbor_1_kolo()
+    expect(page.locator("#riaditel-ziadne-odbory")).to_contain_text("Žiadne odbory v ročníku")
