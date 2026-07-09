@@ -1,30 +1,71 @@
 from playwright.sync_api import Page
+from pages.base_page import BasePage
 
-class PrilohyMS:
+
+class PrilohyMS(BasePage):
+    TYP_PRILOHY = "1"
+    DOVOD = "Odvolanie prílohy."
+    SUBOR_PRILOHA = "./data/Dokument.pdf"
+
     def __init__(self, page: Page):
-        self.page = page
+        super().__init__(page)
 
     def vyziadanie_prilohy_MS(self):
-        self.page.wait_for_timeout(3000)
-        self.page.get_by_role("button", name="Vyžiadať prílohu").click()
-        self.page.get_by_label("Typ prílohy").select_option("1")
-        self.page.get_by_role("textbox", name="Dôvod: *").fill("Odvolanie prílohy.")
-        self.page.get_by_role("button", name="Odoslať").click()
+        self.page.wait_for_load_state("networkidle")
+
+        self._safe_click(
+            self.page.get_by_role("button", name="Vyžiadať prílohu"),
+            "Vyžiadať prílohu"
+        )
+        self._safe_select(
+            self.page.get_by_label("Typ prílohy"),
+            self.TYP_PRILOHY,
+            "Typ prílohy"
+        )
+        self._safe_fill(
+            self.page.get_by_role("textbox", name="Dôvod: *"),
+            self.DOVOD,
+            "Dôvod"
+        )
+        self._safe_click(
+            self.page.get_by_role("button", name="Odoslať"),
+            "Odoslať žiadosť o prílohu"
+        )
 
     def odvolanie_prilohy_MS(self):
-        self.page.wait_for_timeout(5000)
-        self.page.get_by_role("button", name="Odvolať žiadosť").click()
-        self.page.get_by_role("button", name="Áno, odvolať").click()
+        self.page.wait_for_load_state("networkidle")
+
+        self._safe_click(
+            self.page.get_by_role("button", name="Odvolať žiadosť"),
+            "Odvolať žiadosť"
+        )
+        self._safe_click(
+            self.page.get_by_role("button", name="Áno, odvolať"),
+            "Áno, odvolať"
+        )
 
     def pridat_prilohu_MS(self):
         self.page.wait_for_load_state("networkidle")
-        self.page.get_by_role("link", name="Pridať prílohy").click()
-        self.page.locator("span").filter(has_text="add").first.click()
+
+        self._safe_click(
+            self.page.get_by_role("link", name="Pridať prílohy"),
+            "Pridať prílohy"
+        )
+        self._safe_click(
+            self.page.locator("span").filter(has_text="add").first,
+            "Pridať novú prílohu"
+        )
+
         with self.page.expect_file_chooser() as fc_info:
-            self.page.get_by_role("link", name="Vybrať súbor").click()
+            self._safe_click(
+                self.page.get_by_role("link", name="Vybrať súbor"),
+                "Vybrať súbor"
+            )
 
         file_chooser = fc_info.value
-        file_chooser.set_files("./data/Dokument.pdf")
-        self.page.get_by_role("button", name="Odoslať").click()
+        file_chooser.set_files(self.SUBOR_PRILOHA)
 
-    
+        self._safe_click(
+            self.page.get_by_role("button", name="Odoslať"),
+            "Odoslať prílohu"
+        )

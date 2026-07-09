@@ -1,34 +1,102 @@
 from playwright.sync_api import Page
+from pages.base_page import BasePage
 
-class Prijimacky:
+
+class Prijimacky(BasePage):
+    KOLO_2 = "2"
+    ODBOR_2_KOLO = "2b3813df-fbe6-41ce-be28-0efc6dfaca83"
+    ODBOR_1_KOLO = "fa97e1ee-cf77-4880-853a-5972261cdb4c"
+
+    TERMIN_DEN = "12"
+    TERMIN_MESIAC = "10"
+    TERMIN_ROK = "2026"
+    TERMIN_HOD = "11"
+    TERMIN_MIN = "30"
+    MIESTNOST = "3.E"
+
+    VOLITELNY_TEXT_POZVANKA = "Dostavte sa na čas a prineste si kružítko."
+    SUBOR_PRILOHA = "./data/Dokument.pdf"
+
+    POZVANKA_DOWNLOAD_PATH = "data/downloads/pozvankaDownloaded.pdf"
+    BODY_DOWNLOAD_PATH = "data/downloads/bodyDownloaded.pdf"
+
     def __init__(self, page: Page):
-        self.page = page
+        super().__init__(page)
+
+    def _open_vybrat_menu(self):
+        self._safe_click(
+            self.page.get_by_role("button", name="Vybrať").first,
+            "Vybrať"
+        )
+
+    def _open_akcie_menu(self):
+        self._safe_click(
+            self.page.locator("//body/div[@class='wrapper-full']/div[@class='govuk-width-container']/div[@class='govuk-main-wrapper verejna-zona']/div[@class='sub-container']/div[@class='riaditel-prijimacky-container']/div[@class='fixed-left-column']/div[2]/div[1]/div[1]/span[1]"),
+            "Výber akcie"
+        )
+        self._safe_click(
+            self.page.locator("#vykonat-akciu-btn"),
+            "Vykonať akciu"
+        )
 
     def click_on_menu_prijimacky(self):
         self.page.wait_for_load_state("networkidle")
-        self.page.get_by_role("link", name="Prijímačky").click()
+        self._safe_click(
+            self.page.get_by_role("link", name="Prijímačky"),
+            "Prijímačky"
+        )
 
     def click_on_menu_sprava_prihlasok(self):
-        self.page.get_by_role("link", name="Správa prihlášok").click()
+        self._safe_click(
+            self.page.get_by_role("link", name="Správa prihlášok"),
+            "Správa prihlášok"
+        )
 
     def zmen_kolo_a_odbor(self):
-        self.page.get_by_label("Kolo").select_option("2")
-        self.page.get_by_label("Odbor").select_option("2b3813df-fbe6-41ce-be28-0efc6dfaca83")
+        self._safe_select(
+            self.page.get_by_label("Kolo"),
+            self.KOLO_2,
+            "Kolo"
+        )
+        self._safe_select(
+            self.page.get_by_label("Odbor"),
+            self.ODBOR_2_KOLO,
+            "Odbor"
+        )
 
     def zmen_odbor_1_kolo(self):
-        self.page.get_by_label("Odbor").select_option("fa97e1ee-cf77-4880-853a-5972261cdb4c") 
+        self._safe_select(
+            self.page.get_by_label("Odbor"),
+            self.ODBOR_1_KOLO,
+            "Odbor pre 1. kolo"
+        )
 
     def zorad_prihlasky(self):
-        self.page.get_by_role("button", name="Zoradiť podľa: Predvolené").click()
-        self.page.get_by_role("radio", name="Podľa dátumu podania (od").check()
-        self.page.get_by_role("button", name="Zoradiť prihlášky").click()
+        self._safe_click(
+            self.page.get_by_role("button", name="Zoradiť podľa: Predvolené"),
+            "Zoradiť podľa: Predvolené"
+        )
+        self._safe_check(
+            self.page.get_by_role("radio", name="Podľa dátumu podania (od"),
+            "Podľa dátumu podania"
+        )
+        self._safe_click(
+            self.page.get_by_role("button", name="Zoradiť prihlášky"),
+            "Zoradiť prihlášky"
+        )
 
     def click_on_uprava_prihlasky(self):
-        self.page.get_by_role("button", name="Vybrať").first.click()
-        self.page.get_by_role("link", name="Upraviť").click()
+        self._open_vybrat_menu()
+        self._safe_click(
+            self.page.get_by_role("link", name="Upraviť"),
+            "Upraviť"
+        )
 
     def zobraz_prihlasku_detail(self):
-        self.page.get_by_role("button", name="Zobraziť").nth(1).click()
+        self._safe_click(
+            self.page.get_by_role("button", name="Zobraziť").nth(1),
+            "Zobraziť detail prihlášky"
+        )
 
     def get_udaje_dietata(self) -> tuple[str, str, str, str]:
         self.page.wait_for_load_state("networkidle")
@@ -37,57 +105,114 @@ class Prijimacky:
         priezvisko = self.page.locator("#dietaPriezvisko").text_content()
         datum_narodenia = self.page.locator("#dietaDatumNarodenia").text_content()
         return pristupovy_kod, meno, priezvisko, datum_narodenia
-    
+
     def nastavenie_terminu_prijimaciek(self):
-        self.page.get_by_role("textbox", name="Deň").fill("12")
-        self.page.get_by_role("textbox", name="Mesiac").fill("10")
-        self.page.get_by_role("textbox", name="Rok").fill("2026")
-        self.page.get_by_role("textbox", name="Hod.").fill("11")
-        self.page.get_by_role("textbox", name="Min.").fill("30")
-        self.page.get_by_role("textbox", name="Miestnosť").fill("3.E")
-        self.page.get_by_role("button", name="Uložiť").click()
+        self._safe_fill(
+            self.page.get_by_role("textbox", name="Deň"),
+            self.TERMIN_DEN,
+            "Deň"
+        )
+        self._safe_fill(
+            self.page.get_by_role("textbox", name="Mesiac"),
+            self.TERMIN_MESIAC,
+            "Mesiac"
+        )
+        self._safe_fill(
+            self.page.get_by_role("textbox", name="Rok"),
+            self.TERMIN_ROK,
+            "Rok"
+        )
+        self._safe_fill(
+            self.page.get_by_role("textbox", name="Hod."),
+            self.TERMIN_HOD,
+            "Hodina"
+        )
+        self._safe_fill(
+            self.page.get_by_role("textbox", name="Min."),
+            self.TERMIN_MIN,
+            "Minúta"
+        )
+        self._safe_fill(
+            self.page.get_by_role("textbox", name="Miestnosť"),
+            self.MIESTNOST,
+            "Miestnosť"
+        )
+        self._safe_click(
+            self.page.get_by_role("button", name="Uložiť"),
+            "Uložiť termín prijímačiek"
+        )
 
     def click_on_akcia_odoslat_pozvanky(self):
-        self.page.locator("//body/div[@class='wrapper-full']/div[@class='govuk-width-container']/div[@class='govuk-main-wrapper verejna-zona']/div[@class='sub-container']/div[@class='riaditel-prijimacky-container']/div[@class='fixed-left-column']/div[2]/div[1]/div[1]/span[1]").click()
-        self.page.locator("#vykonat-akciu-btn").click()
-        self.page.locator("a").filter(has_text="Odoslať pozvánky").last.click()
+        self._open_akcie_menu()
+        self._safe_click(
+            self.page.locator("a").filter(has_text="Odoslať pozvánky").last,
+            "Odoslať pozvánky"
+        )
 
     def odoslat_pozvanky(self):
-        self.page.get_by_role("button", name="Pokračovať").click()
-        self.page.get_by_role("textbox", name="Voliteľný text").fill("Dostavte sa na čas a prineste si kružítko.")
-        
+        self._safe_click(
+            self.page.get_by_role("button", name="Pokračovať"),
+            "Pokračovať - pozvánky 1"
+        )
+        self._safe_fill(
+            self.page.get_by_role("textbox", name="Voliteľný text"),
+            self.VOLITELNY_TEXT_POZVANKA,
+            "Voliteľný text"
+        )
+
         with self.page.expect_file_chooser() as fc_info:
-            self.page.get_by_role("button", name="Vybrať súbor").click()
+            self._safe_click(
+                self.page.get_by_role("button", name="Vybrať súbor"),
+                "Vybrať súbor pre pozvánky"
+            )
 
         file_chooser = fc_info.value
-        file_chooser.set_files("./data/Dokument.pdf")
+        file_chooser.set_files(self.SUBOR_PRILOHA)
 
-        self.page.get_by_role("button", name="Odoslať").click()
+        self._safe_click(
+            self.page.get_by_role("button", name="Odoslať"),
+            "Odoslať pozvánky"
+        )
 
     def click_on_spat_na_prijimacky(self):
-        self.page.get_by_role("link", name="Späť na prijímačky").click()
+        self._safe_click(
+            self.page.get_by_role("link", name="Späť na prijímačky"),
+            "Späť na prijímačky"
+        )
 
     def click_on_akcia_plny_pocet_bodov(self):
-        self.page.locator("//body/div[@class='wrapper-full']/div[@class='govuk-width-container']/div[@class='govuk-main-wrapper verejna-zona']/div[@class='sub-container']/div[@class='riaditel-prijimacky-container']/div[@class='fixed-left-column']/div[2]/div[1]/div[1]/span[1]").click()
-        self.page.locator("#vykonat-akciu-btn").click()
-        self.page.locator("a").filter(has_text="Odoslať správu o plnom počte bodov").last.click()
+        self._open_akcie_menu()
+        self._safe_click(
+            self.page.locator("a").filter(has_text="Odoslať správu o plnom počte bodov").last,
+            "Odoslať správu o plnom počte bodov"
+        )
 
     def odoslat_plny_pocet_bodov(self):
-        self.page.get_by_role("button", name="Pokračovať").click()
-        self.page.get_by_role("button", name="Pokračovať").click()
+        self._safe_click(
+            self.page.get_by_role("button", name="Pokračovať"),
+            "Pokračovať - plný počet bodov 1"
+        )
+        self._safe_click(
+            self.page.get_by_role("button", name="Pokračovať"),
+            "Pokračovať - plný počet bodov 2"
+        )
 
     def stiahni_pozvanku(self):
-        self.page.get_by_role("button", name="Vybrať").first.click()
+        self._open_vybrat_menu()
         with self.page.expect_download() as download_info:
-            self.page.locator("a").filter(has_text="Stiahnuť PDF - Pozvánka").last.click()
+            self._safe_click(
+                self.page.locator("a").filter(has_text="Stiahnuť PDF - Pozvánka").last,
+                "Stiahnuť PDF - Pozvánka"
+            )
         download = download_info.value
-        download.save_as("data/downloads/pozvankaDownloaded.pdf")
+        download.save_as(self.POZVANKA_DOWNLOAD_PATH)
 
     def stiahni_body(self):
-        self.page.get_by_role("button", name="Vybrať").first.click()
+        self._open_vybrat_menu()
         with self.page.expect_download() as download_info:
-            self.page.locator("a").filter(has_text="Stiahnuť PDF - Správa o bodoch").last.click()
-        download1 = download_info.value
-        download1.save_as("data/downloads/bodyDownloaded.pdf")
-
-        
+            self._safe_click(
+                self.page.locator("a").filter(has_text="Stiahnuť PDF - Správa o bodoch").last,
+                "Stiahnuť PDF - Správa o bodoch"
+            )
+        download = download_info.value
+        download.save_as(self.BODY_DOWNLOAD_PATH)

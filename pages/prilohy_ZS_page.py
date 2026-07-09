@@ -1,32 +1,78 @@
 from playwright.sync_api import Page
-from pytest_playwright.pytest_playwright import page
+from pages.base_page import BasePage
 
-class PrilohyZS:
+
+class PrilohyZS(BasePage):
+    TYP_PRILOHY = "3"
+    SUBOR = "./data/Dokument.pdf"
+
     def __init__(self, page: Page):
-        self.page = page
+        super().__init__(page)
 
     def vyziadat_prilohu(self, dovod: str):
         self.page.wait_for_timeout(3000)
-        self.page.get_by_role("button", name="Vyžiadať prílohu").click()
-        self.page.get_by_label("Typ prílohy").select_option("3")
-        self.page.get_by_role("textbox", name="Dôvod: *").fill(dovod)
-        self.page.get_by_role("button", name="Odoslať").click()
+
+        self._safe_click(
+            self.page.get_by_role("button", name="Vyžiadať prílohu"),
+            "Vyžiadať prílohu"
+        )
+
+        self._safe_select(
+            self.page.get_by_label("Typ prílohy"),
+            self.TYP_PRILOHY,
+            "Typ prílohy"
+        )
+
+        self._safe_fill(
+            self.page.get_by_role("textbox", name="Dôvod: *"),
+            dovod,
+            "Dôvod vyžiadania prílohy"
+        )
+
+        self._safe_click(
+            self.page.get_by_role("button", name="Odoslať"),
+            "Odoslať žiadosť o prílohu"
+        )
 
     def odvolat_ziadost(self):
         self.page.wait_for_timeout(5000)
-        self.page.get_by_role("button", name="Odvolať žiadosť").click()
-        self.page.get_by_role("button", name="Áno, odvolať").click()
+
+        self._safe_click(
+            self.page.get_by_role("button", name="Odvolať žiadosť"),
+            "Odvolať žiadosť"
+        )
+        self._safe_click(
+            self.page.get_by_role("button", name="Áno, odvolať"),
+            "Potvrdiť odvolanie žiadosti"
+        )
 
     def pridat_prilohu(self):
-        self.page.get_by_role("link", name="Pridať prílohy").click()
-        self.page.get_by_text("Čestné vyhlásenie zákonného zástupcu Nenahrané Nenahrané Nahrané").click()
-        
+        self._safe_click(
+            self.page.get_by_role("link", name="Pridať prílohy"),
+            "Pridať prílohy"
+        )
+
+        self._safe_click(
+            self.page.get_by_text("Čestné vyhlásenie zákonného zástupcu Nenahrané Nenahrané Nahrané"),
+            "Vybrať typ prílohy - Čestné vyhlásenie zákonného zástupcu"
+        )
+
         with self.page.expect_file_chooser() as fc_info:
-            self.page.get_by_role("link", name="Vybrať súbor").click()
+            self._safe_click(
+                self.page.get_by_role("link", name="Vybrať súbor"),
+                "Vybrať súbor"
+            )
 
         file_chooser = fc_info.value
-        file_chooser.set_files("./data/Dokument.pdf")
-        self.page.get_by_role("button", name="Odoslať").click()
+        file_chooser.set_files(self.SUBOR)
+
+        self._safe_click(
+            self.page.get_by_role("button", name="Odoslať"),
+            "Odoslať prílohu"
+        )
 
     def click_on_prejst_na_prihlasky(self):
-        self.page.get_by_role("link", name="Prejsť na prihlášky").click()
+        self._safe_click(
+            self.page.get_by_role("link", name="Prejsť na prihlášky"),
+            "Prejsť na prihlášky"
+        )

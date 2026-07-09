@@ -1,90 +1,274 @@
-import re
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Page
+from pages.base_page import BasePage
 
-class PapierovaPrihlaskaMS:
+
+class PapierovaPrihlaskaMS(BasePage):
+    KRAJINA = "slovenská rep"
+    KRAJINA_LABEL = "Slovenská republika"
+    OBEC = "Kord"
+    OBEC_LABEL = "Kordíky (Banská Bystrica)"
+    ULICA = "Miksa"
+    ULICA_LABEL = "Miksáthova"
+    SUPISNE_CISLO = "8"
+    ORIENTACNE_CISLO = "635"
+    PSC = "02845"
+
+    DATUM_NASTUP_DEN = "1"
+    DATUM_NASTUP_MESIAC = "9"
+    DATUM_NASTUP_ROK = "2026"
+
+    ZZ_MENO = "Peter"
+    ZZ_PRIEZVISKO = "Fodrok"
+    ZZ_RC = "860201/7842"
+    ZZ_EMAIL = "katalontest987@gmail.com"
+    ZZ_TELEFON = "+421905866541"
+
+    SUBOR_PRILOHA = "./data/Dokument.pdf"
+    POZNAMKA_SKOLY = ":)"
+
     def __init__(self, page: Page):
-        self.page = page
+        super().__init__(page)
+
+    def _click_dalej(self, nazov_kroku: str):
+        self._safe_click(
+            self.page.get_by_role("button", name="Ďalej"),
+            nazov_kroku
+        )
+
+    def _potvrd_existujucu_prihlasku_ak_treba(self):
+        hlaska = self.page.get_by_text("Pre tohto žiaka už existuje prihláška.", exact=True)
+        if hlaska.is_visible():
+            self._safe_click(
+                self.page.locator("button.btn-confirm.govuk-button.govuk-button__large.last-focusable"),
+                "Potvrdiť existujúcu prihlášku"
+            )
+
+            pridat_btn = self.page.locator("button").filter(has_text="Pridať prihlášku").last
+            if pridat_btn.is_visible():
+                self._safe_click(
+                    pridat_btn,
+                    "Pridať prihlášku po potvrdení"
+                )
 
     def click_on_pridaj_prihlasku(self):
         self.page.wait_for_load_state("networkidle")
-        self.page.get_by_role("button", name="Pridať prihlášku").click()
+        self._safe_click(
+            self.page.get_by_role("button", name="Pridať prihlášku"),
+            "Pridať prihlášku"
+        )
 
-    def step_1_osobne_udaje(self, meno:str, priezvisko:str, rc:str):
-        self.page.locator("#maDietaRCRadio_option_0").check()
-        #self.page.get_by_role("radio", name="Áno").check()
-        self.page.get_by_role("textbox", name="Rodné číslo *").fill(rc)
-        self.page.get_by_role("button", name="Ďalej").click()
+    def step_1_osobne_udaje(self, meno: str, priezvisko: str, rc: str):
+        self._safe_check(
+            self.page.locator("#maDietaRCRadio_option_0"),
+            "Dieťa má rodné číslo"
+        )
+        self._safe_fill(
+            self.page.get_by_role("textbox", name="Rodné číslo *"),
+            rc,
+            "Rodné číslo"
+        )
+        self._click_dalej("Ďalej - rodné číslo")
 
-        if self.page.get_by_text("Pre tohto žiaka už existuje prihláška.", exact=True).is_visible():
-            self.page.locator("button.btn-confirm.govuk-button.govuk-button__large.last-focusable").click()
-            if self.page.locator("button").filter(has_text="Pridať prihlášku").last.is_visible():
-                self.page.locator("button").filter(has_text="Pridať prihlášku").last.click()
-                
+        self._potvrd_existujucu_prihlasku_ak_treba()
+
         self.page.wait_for_load_state("networkidle")
-        self.page.get_by_role("textbox", name="Meno *").fill(meno)
-        self.page.get_by_role("textbox", name="Priezvisko *").fill(priezvisko)
-        self.page.get_by_role("textbox", name="Rodné priezvisko").fill(priezvisko)
-        self.page.locator("#input-miestoNarodenia").fill("Slovensko")
-        self.page.locator("#adresaTPKrajina > .govuk-form-group > .input-wrapper > .govuk-input.autocomplete-input").fill("slovenská rep")
-        self.page.locator("#adresaTPKrajina").get_by_text("Slovenská republika", exact=True).click()
-        self.page.locator("#adresaTPObec > .govuk-form-group > .input-wrapper > .govuk-input.autocomplete-input").fill("Kord")
-        self.page.get_by_text("Kordíky (Banská Bystrica)").click()
-        self.page.get_by_role("textbox", name="Krajina *").fill("Miksa")
-        self.page.get_by_text("Miksáthova").click()
-        self.page.get_by_role("textbox", name="Súpisné číslo").fill("8")
-        self.page.get_by_role("textbox", name="Orientačné číslo *").fill("635")
-        self.page.get_by_role("textbox", name="PSČ *").fill("02845")
-        self.page.get_by_role("button", name="Ďalej").click()
-        self.page.get_by_role("button", name="Ďalej").click()
+
+        self._safe_fill(
+            self.page.get_by_role("textbox", name="Meno *"),
+            meno,
+            "Meno"
+        )
+        self._safe_fill(
+            self.page.get_by_role("textbox", name="Priezvisko *"),
+            priezvisko,
+            "Priezvisko"
+        )
+        self._safe_fill(
+            self.page.get_by_role("textbox", name="Rodné priezvisko"),
+            priezvisko,
+            "Rodné priezvisko"
+        )
+        self._safe_fill(
+            self.page.locator("#input-miestoNarodenia"),
+            "Slovensko",
+            "Miesto narodenia"
+        )
+
+        self._safe_fill(
+            self.page.locator("#adresaTPKrajina > .govuk-form-group > .input-wrapper > .govuk-input.autocomplete-input"),
+            self.KRAJINA,
+            "Krajina"
+        )
+        self._safe_click(
+            self.page.locator("#adresaTPKrajina").get_by_text(self.KRAJINA_LABEL, exact=True),
+            "Slovenská republika"
+        )
+
+        self._safe_fill(
+            self.page.locator("#adresaTPObec > .govuk-form-group > .input-wrapper > .govuk-input.autocomplete-input"),
+            self.OBEC,
+            "Obec"
+        )
+        self._safe_click(
+            self.page.get_by_text(self.OBEC_LABEL),
+            "Kordíky (Banská Bystrica)"
+        )
+
+        self._safe_fill(
+            self.page.get_by_role("textbox", name="Krajina *"),
+            self.ULICA,
+            "Ulica"
+        )
+        self._safe_click(
+            self.page.get_by_text(self.ULICA_LABEL),
+            "Miksáthova"
+        )
+
+        self._safe_fill(
+            self.page.get_by_role("textbox", name="Súpisné číslo"),
+            self.SUPISNE_CISLO,
+            "Súpisné číslo"
+        )
+        self._safe_fill(
+            self.page.get_by_role("textbox", name="Orientačné číslo *"),
+            self.ORIENTACNE_CISLO,
+            "Orientačné číslo"
+        )
+        self._safe_fill(
+            self.page.get_by_role("textbox", name="PSČ *"),
+            self.PSC,
+            "PSČ"
+        )
+
+        self._click_dalej("Ďalej - osobné údaje")
+        self._click_dalej("Ďalej - pokračovanie po osobných údajoch")
 
     def step_2_SVVP(self):
-        self.page.get_by_role("radio", name="celodennú výchovu a vzdelá").check()
-        self.page.locator("#DPDSVVPRadio_option_1").check()
-        self.page.locator("#DPDDietaSNadanimRadio_option_1").check()
-        self.page.get_by_role("textbox", name="Deň").fill("1")
-        self.page.get_by_role("textbox", name="Mesiac").fill("9")
-        self.page.get_by_role("textbox", name="Rok").fill("2026")
-        self.page.get_by_role("button", name="Ďalej").click()
+        self._safe_check(
+            self.page.get_by_role("radio", name="celodennú výchovu a vzdelá"),
+            "Celodennú výchovu a vzdelávanie"
+        )
+        self._safe_check(
+            self.page.locator("#DPDSVVPRadio_option_1"),
+            "ŠVVP - Nie"
+        )
+        self._safe_check(
+            self.page.locator("#DPDDietaSNadanimRadio_option_1"),
+            "Dieťa s nadaním - Nie"
+        )
+        self._safe_fill(
+            self.page.get_by_role("textbox", name="Deň"),
+            self.DATUM_NASTUP_DEN,
+            "Deň nástupu"
+        )
+        self._safe_fill(
+            self.page.get_by_role("textbox", name="Mesiac"),
+            self.DATUM_NASTUP_MESIAC,
+            "Mesiac nástupu"
+        )
+        self._safe_fill(
+            self.page.get_by_role("textbox", name="Rok"),
+            self.DATUM_NASTUP_ROK,
+            "Rok nástupu"
+        )
+        self._click_dalej("Ďalej - SVVP")
 
     def step_3_vyber_skoly(self):
-        self.page.get_by_role("button", name="Ďalej").click()
-        self.page.get_by_role("button", name="Ďalej").click()
-        self.page.get_by_role("button", name="Ďalej").click()
+        self._click_dalej("Ďalej - výber školy 1")
+        self._click_dalej("Ďalej - výber školy 2")
+        self._click_dalej("Ďalej - výber školy 3")
 
     def step_4_ZZ(self):
-        self.page.get_by_role("textbox", name="Meno *").fill("Peter")
-        self.page.get_by_role("textbox", name="Priezvisko *").fill("Fodrok")
-        self.page.get_by_role("textbox", name="Rodné číslo *").fill("860201/7842")
-        self.page.get_by_role("textbox", name="E-mail").fill("katalontest987@gmail.com")
-        self.page.get_by_role("textbox", name="Telefónne číslo *").fill("+421905866541")
+        self._safe_fill(
+            self.page.get_by_role("textbox", name="Meno *"),
+            self.ZZ_MENO,
+            "Meno zákonného zástupcu"
+        )
+        self._safe_fill(
+            self.page.get_by_role("textbox", name="Priezvisko *"),
+            self.ZZ_PRIEZVISKO,
+            "Priezvisko zákonného zástupcu"
+        )
+        self._safe_fill(
+            self.page.get_by_role("textbox", name="Rodné číslo *"),
+            self.ZZ_RC,
+            "Rodné číslo zákonného zástupcu"
+        )
+        self._safe_fill(
+            self.page.get_by_role("textbox", name="E-mail"),
+            self.ZZ_EMAIL,
+            "E-mail zákonného zástupcu"
+        )
+        self._safe_fill(
+            self.page.get_by_role("textbox", name="Telefónne číslo *"),
+            self.ZZ_TELEFON,
+            "Telefónne číslo zákonného zástupcu"
+        )
+
         self.page.wait_for_timeout(1000)
-        self.page.get_by_role("button", name="Ďalej").click()
-        if self.page.get_by_role("textbox", name="Telefónne číslo *").is_visible():
-            self.page.get_by_role("button", name="Ďalej").click()
+
+        self._click_dalej("Ďalej - zákonný zástupca")
+        if self.page.get_by_role("textbox", name="Telefónne číslo *").is_visible():
+            self._click_dalej("Ďalej - zákonný zástupca opakovanie")
 
     def step_5_prilohy(self):
-        self.page.get_by_text("Potvrdenie o zdravotnej spôsobilosti (materská škola) Nenahrané Nenahrané").click()
+        self._safe_click(
+            self.page.get_by_text("Potvrdenie o zdravotnej spôsobilosti (materská škola) Nenahrané Nenahrané"),
+            "Potvrdenie o zdravotnej spôsobilosti"
+        )
 
         with self.page.expect_file_chooser() as fc_info:
-            self.page.get_by_role("link", name="Vybrať súbor").click()
+            self._safe_click(
+                self.page.get_by_role("link", name="Vybrať súbor"),
+                "Vybrať súbor"
+            )
 
         file_chooser = fc_info.value
-        file_chooser.set_files("./data/Dokument.pdf")
+        file_chooser.set_files(self.SUBOR_PRILOHA)
 
-        self.page.get_by_role("button", name="Ďalej").click()
+        self._click_dalej("Ďalej - prílohy")
 
-    def step_6_ostatne_udaje(self, den:str, mesiac:str, rok:str):
-        self.page.get_by_role("textbox", name="Deň").fill(den)
-        self.page.get_by_role("textbox", name="Mesiac").fill(mesiac)
-        self.page.get_by_role("textbox", name="Rok").fill(rok)
-        self.page.get_by_role("textbox", name="Poznámka školy:").fill(":)")
-        self.page.get_by_role("button", name="Ďalej").click()
+    def step_6_ostatne_udaje(self, den: str, mesiac: str, rok: str):
+        self._safe_fill(
+            self.page.get_by_role("textbox", name="Deň"),
+            den,
+            "Deň"
+        )
+        self._safe_fill(
+            self.page.get_by_role("textbox", name="Mesiac"),
+            mesiac,
+            "Mesiac"
+        )
+        self._safe_fill(
+            self.page.get_by_role("textbox", name="Rok"),
+            rok,
+            "Rok"
+        )
+        self._safe_fill(
+            self.page.get_by_role("textbox", name="Poznámka školy:"),
+            self.POZNAMKA_SKOLY,
+            "Poznámka školy"
+        )
+        self._click_dalej("Ďalej - ostatné údaje")
 
     def click_on_odoslat_prihlasku(self):
-        self.page.get_by_role("button", name="Pridať prihlášku").click()
+        self._safe_click(
+            self.page.get_by_role("button", name="Pridať prihlášku"),
+            "Pridať prihlášku"
+        )
         self.page.wait_for_load_state("load", timeout=15000)
 
-    def najdi_prihlasku(self, meno:str, priezvisko:str):
-        self.page.get_by_role("textbox", name="Vyhľadávanie v meno,").fill(meno + " " + priezvisko)
-        self.page.get_by_role("button", name="Hľadať").click()
-        self.page.locator("button").filter(has_text="Zobraziť").first.click()
+    def najdi_prihlasku(self, meno: str, priezvisko: str):
+        self._safe_fill(
+            self.page.get_by_role("textbox", name="Vyhľadávanie v meno,"),
+            f"{meno} {priezvisko}",
+            "Vyhľadávanie prihlášky"
+        )
+        self._safe_click(
+            self.page.get_by_role("button", name="Hľadať"),
+            "Hľadať"
+        )
+        self._safe_click(
+            self.page.locator("button").filter(has_text="Zobraziť").first,
+            "Zobraziť prihlášku"
+        )

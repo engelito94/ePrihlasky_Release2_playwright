@@ -1,16 +1,22 @@
-import re
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Page
+from pages.base_page import BasePage
 
 
-class LogoutPage:
+class LogoutPage(BasePage):
     def __init__(self, page: Page):
-        self.page = page
+        super().__init__(page)
 
     def _click_on_menu(self):
-        self.page.get_by_role("link", name="Rozbaliť profilové menu").click()
-    
+        self._safe_click(
+            self.page.get_by_role("link", name="Rozbaliť profilové menu"),
+            "Rozbaliť profilové menu"
+        )
+
     def _click_on_logout(self):
-        self.page.get_by_role("link", name="Odhlásiť").click()
+        self._safe_click(
+            self.page.get_by_role("link", name="Odhlásiť"),
+            "Odhlásiť"
+        )
 
     def logout(self):
         self._click_on_menu()

@@ -1,36 +1,57 @@
-import pytest
 import os
 import re
+import pytest
 import utils.data_helper as Data
-from utils.helpers import Helper 
+
+from utils.helpers import Helper
 from utils.mail_helper import Mail
-from pages.logout_page import LogoutPage
 from playwright.sync_api import Page, expect
+
+from pages.logout_page import LogoutPage
 from pages.login_page import LoginPage
 from pages.prihlaska_MS_page import PrihlaskaMS
 from pages.papierova_prihlaska_MS_page import PapierovaPrihlaskaMS
-from pages.konflikt_MS_page import konfliktMS
+from pages.konflikt_MS_page import KonfliktMS
 
 
-username=os.getenv("EPRIHLASKY_ZZ_USERNAME")
-password=os.getenv("EPRIHLASKY_ZZ_PASSWORD")
-username_riad=os.getenv("EPRIHLASKY_RIADITEL_USERNAME")
-password_riad=os.getenv("EPRIHLASKY_RIADITEL_PASSWORD")
-mailuser=os.getenv("GMAIL_USERNAME")
-mailpw=os.getenv("GMAIL_APP_PASSWORD")
+username = os.getenv("EPRIHLASKY_ZZ_USERNAME")
+password = os.getenv("EPRIHLASKY_ZZ_PASSWORD")
+username_riad = os.getenv("EPRIHLASKY_RIADITEL_USERNAME")
+password_riad = os.getenv("EPRIHLASKY_RIADITEL_PASSWORD")
+mailuser = os.getenv("GMAIL_USERNAME")
+mailpw = os.getenv("GMAIL_APP_PASSWORD")
+
 
 @pytest.fixture(scope="module")
 def person_data():
     return Data.generate_unique_person(min_age=4, max_age=5)
 
-@pytest.mark.regres1kolo
-@pytest.mark.regres2kolo
-def test_vytvorenie_konfliktu_na_MŠ(page: Page, person_data) -> None:
-    data = person_data
-    helper = Helper()
+
+def _expect_text(locator, text: str, message: str) -> None:
+    expect(locator, message).to_contain_text(text)
+
+
+def _expect_url(page: Page, pattern: str, message: str, timeout: int = 35000) -> None:
+    expect(page, message).to_have_url(re.compile(pattern), timeout=timeout)
+
+
+def _normalize_email_text(raw_email: str, helper: Helper) -> str:
+    return helper.cleanup_email_text(raw_email)
+
+
+def _assert_email_in_options(actual: str, options: list[str], message: str) -> None:
+    assert actual in options, (
+        f"{message}\n\n"
+        f"=== ACTUAL ===\n{actual}\n\n"
+        f"=== EXPECTED OPTIONS ===\n" + "\n---\n".join(options)
+    )
+
+
+def _create_electronic_ms_application(page: Page, data) -> None:
     login = LoginPage(page)
     logout = LogoutPage(page)
     prihlaska = PrihlaskaMS(page)
+
     login.login_as_zakonny_zastupca(username, password)
     prihlaska.click_on_vytvorit_prihlasku()
     prihlaska.step_1_pridat_dieta(data.meno, data.priezvisko, data.rodne_cislo)
@@ -39,23 +60,161 @@ def test_vytvorenie_konfliktu_na_MŠ(page: Page, person_data) -> None:
     prihlaska.step_4_ZZ()
     prihlaska.step_5_prilohy()
     prihlaska.odoslat_prihlasku_MS()
-    expect(page).to_have_url(re.compile(r".*/Prihlaska-odoslana.*"), timeout=35000)
-    expect(page.locator("h1")).to_contain_text("Prihláška bola úspešne odoslaná!")
+
+    _expect_url(
+        page,
+        r".*/Prihlaska-odoslana.*",
+        "Po odoslaní elektronickej prihlášky sa neotvorila stránka Prihláška odoslaná."
+    )
+    _expect_text(
+        page.locator("h1"),
+        "Prihláška bola úspešne odoslaná!",
+        "Po odoslaní elektronickej prihlášky sa nezobrazil úspešný nadpis."
+    )
+
     logout.logout()
-    login.login_as_riaditel(username_riad, password_riad, "910021626")
-    expect(page).to_have_url(re.compile(r".*/Riaditel*"), timeout=35000)
-    prihlaskaRiad = PapierovaPrihlaskaMS(page)
+
+
+def _create_paper_ms_application(page: Page, data, helper: Helper) -> None:
+    login = LoginPage(page)
+    prihlaska_riad = PapierovaPrihlaskaMS(page)
     den, mesiac, rok = helper.aktualny_datum()
-    prihlaskaRiad.click_on_pridaj_prihlasku()
-    prihlaskaRiad.step_1_osobne_udaje(data.meno, data.priezvisko, data.rodne_cislo)
-    prihlaskaRiad.step_2_SVVP()
-    prihlaskaRiad.step_3_vyber_skoly()
-    prihlaskaRiad.step_4_ZZ()
-    prihlaskaRiad.step_5_prilohy()
-    prihlaskaRiad.step_6_ostatne_udaje(den, mesiac, rok)
-    prihlaskaRiad.click_on_odoslat_prihlasku()
-    expect(page).to_have_url(re.compile(r".*/Riaditel.*"), timeout=25000)
-    expect(page.locator("#riaditel-home-page")).to_contain_text("Prihlášku pre dieťa ste úspešne pridali.")
+
+    login.login_as_riaditel(username_riad, password_riad, "910021626")
+    _expect_url(
+        page,
+        r".*/Riaditel.*",
+        "Po prihlásení riaditeľa sa neotvorila stránka riaditeľa."
+    )
+
+    prihlaska_riad.click_on_pridaj_prihlasku()
+    prihlaska_riad.step_1_osobne_udaje(data.meno, data.priezvisko, data.rodne_cislo)
+    prihlaska_riad.step_2_SVVP()
+    prihlaska_riad.step_3_vyber_skoly()
+    prihlaska_riad.step_4_ZZ()
+    prihlaska_riad.step_5_prilohy()
+    prihlaska_riad.step_6_ostatne_udaje(den, mesiac, rok)
+    prihlaska_riad.click_on_odoslat_prihlasku()
+
+    _expect_url(
+        page,
+        r".*/Riaditel.*",
+        "Po odoslaní papierovej prihlášky sa nevrátila stránka riaditeľa.",
+        timeout=25000
+    )
+    _expect_text(
+        page.locator("#riaditel-home-page"),
+        "Prihlášku pre dieťa ste úspešne pridali.",
+        "Po odoslaní papierovej prihlášky sa nezobrazila úspešná hláška."
+    )
+
+
+def _build_conflict_notice_options(data, helper: Helper) -> list[str]:
+    return [
+        (
+            f"Vážený/á pán/pani Peter Fodrok, v systéme bolo zistené, že pre žiaka "
+            f"{data.meno} {data.priezvisko} nar. {helper.rc_to_datum_narodenia(data.rodne_cislo)} "
+            f"boli podané viaceré prihlášky. Riaditeľ školy Materská škola pre AT Vás týmto vyzýva, "
+            f"aby ste ho bezodkladne kontaktovali a informovali, ktorú prihlášku si želáte ponechať ako platnú. "
+            f"Sprievodná správa od riaditeľa: Výzva na vyriešenie konfliktu. Bez vyriešenia tohto konfliktu "
+            f"nebudú prihlášky ďalej spracované. S pozdravom Tím elektronických prihlášok MŠVVaM SR "
+            f"Tento email bol generovaný automaticky portálom Elektronické prihlášky do škôl, ktorý je v správe "
+            f"Ministerstva školstva, výskumu, vývoja a mládeže Slovenskej republiky. Neodpovedajte naň."
+        ),
+        (
+            f"Vážený/á pán/pani Mária Bartošová, v systéme bolo zistené, že pre žiaka "
+            f"{data.meno} {data.priezvisko} nar. {helper.rc_to_datum_narodenia(data.rodne_cislo)} "
+            f"boli podané viaceré prihlášky. Riaditeľ školy Materská škola pre AT Vás týmto vyzýva, "
+            f"aby ste ho bezodkladne kontaktovali a informovali, ktorú prihlášku si želáte ponechať ako platnú. "
+            f"Sprievodná správa od riaditeľa: Výzva na vyriešenie konfliktu. Bez vyriešenia tohto konfliktu "
+            f"nebudú prihlášky ďalej spracované. S pozdravom Tím elektronických prihlášok MŠVVaM SR "
+            f"Tento email bol generovaný automaticky portálom Elektronické prihlášky do škôl, ktorý je v správe "
+            f"Ministerstva školstva, výskumu, vývoja a mládeže Slovenskej republiky. Neodpovedajte naň."
+        ),
+    ]
+
+
+def _build_resolution_options(
+    typ_prihlasky: str,
+    identifikator: str,
+    identifikator1: str,
+    data,
+    helper: Helper,
+) -> list[str]:
+    if typ_prihlasky == "Elektronicky":
+        return [
+            (
+                f"Vážený/á pán/pani Mária Bartošová, Prihláška {identifikator} bola v konflikte "
+                f"s prihláškou/prihláškami {identifikator}, {identifikator1}. Konflikt bol vyriešený . "
+                f"V systéme bude ďalej evidovaná len prihláška {identifikator}. S pozdravom "
+                f"Tím elektronických prihlášok MŠVVaM SR Tento email bol generovaný automaticky portálom "
+                f"Elektronické prihlášky do škôl, ktorý je v správe Ministerstva školstva, výskumu, "
+                f"vývoja a mládeže Slovenskej republiky. Neodpovedajte naň."
+            ),
+            (
+                f"Vážený/á pán/pani Peter Fodrok, riaditeľ školy Materská škola pre AT vyriešil konflikt "
+                f"viacerých prihlášok podaných pre žiaka {data.meno} {data.priezvisko} nar. "
+                f"{helper.rc_to_datum_narodenia(data.rodne_cislo)}. Ako aktívna bola označená prihláška "
+                f"s identifikátorom {identifikator}, ktorú podal/podala Mária Bartošová. Ostatné prihlášky "
+                f"boli označené ako “Konflikt - neaktívna” a nebudú ďalej spracované. Stav prihlášky si môžete "
+                f"overiť po prihlásení do portálu Elektronické prihlášky: Link na prihlásenie S pozdravom "
+                f"Tím elektronických prihlášok MŠVVaM SR Tento email bol generovaný automaticky portálom "
+                f"Elektronické prihlášky do škôl, ktorý je v správe Ministerstva školstva, výskumu, vývoja "
+                f"a mládeže Slovenskej republiky. Neodpovedajte naň."
+            ),
+        ]
+
+    return [
+        (
+            f"Vážený/á pán/pani Mária Bartošová, Prihláška {identifikator1} bola v konflikte "
+            f"s prihláškou/prihláškami {identifikator1}, {identifikator}. Konflikt bol vyriešený . "
+            f"V systéme bude ďalej evidovaná len prihláška {identifikator1}. S pozdravom "
+            f"Tím elektronických prihlášok MŠVVaM SR Tento email bol generovaný automaticky portálom "
+            f"Elektronické prihlášky do škôl, ktorý je v správe Ministerstva školstva, výskumu, "
+            f"vývoja a mládeže Slovenskej republiky. Neodpovedajte naň."
+        ),
+        (
+            f"Vážený/á pán/pani Peter Fodrok, riaditeľ školy Materská škola pre AT vyriešil konflikt "
+            f"viacerých prihlášok podaných pre dieťa {data.meno} {data.priezvisko} nar. "
+            f"{helper.rc_to_datum_narodenia(data.rodne_cislo)}. Ako aktívna bola označená prihláška "
+            f"s identifikátorom {identifikator1}, ktorú podal/podala Mária Bartošová. Ostatné prihlášky "
+            f"boli označené ako “Konflikt - neaktívna” a nebudú ďalej spracované. Stav prihlášky si môžete "
+            f"overiť po prihlásení do portálu Elektronické prihlášky: Link na prihlásenie S pozdravom "
+            f"Tím elektronických prihlášok MŠVVaM SR Tento email bol generovaný automaticky portálom "
+            f"Elektronické prihlášky do škôl, ktorý je v správe Ministerstva školstva, výskumu, vývoja "
+            f"a mládeže Slovenskej republiky. Neodpovedajte naň."
+        ),
+        (
+            f"Vážený/á pán/pani Peter Fodrok, riaditeľ školy Materská škola pre AT vyriešil konflikt "
+            f"viacerých prihlášok podaných pre dieťa {data.meno} {data.priezvisko} nar. "
+            f"{helper.rc_to_datum_narodenia(data.rodne_cislo)}. Ako aktívna bola označená prihláška "
+            f"s identifikátorom {identifikator}, ktorú podal/podala Mária Bartošová. Ostatné prihlášky "
+            f"boli označené ako “Konflikt - neaktívna” a nebudú ďalej spracované. Stav prihlášky si môžete "
+            f"overiť po prihlásení do portálu Elektronické prihlášky: Link na prihlásenie S pozdravom "
+            f"Tím elektronických prihlášok MŠVVaM SR Tento email bol generovaný automaticky portálom "
+            f"Elektronické prihlášky do škôl, ktorý je v správe Ministerstva školstva, výskumu, vývoja "
+            f"a mládeže Slovenskej republiky. Neodpovedajte naň."
+        ),
+        (
+            f"Vážený/á pán/pani Mária Bartošová, Prihláška {identifikator} bola v konflikte "
+            f"s prihláškou/prihláškami {identifikator}, {identifikator1}. Konflikt bol vyriešený . "
+            f"V systéme bude ďalej evidovaná len prihláška {identifikator}. S pozdravom "
+            f"Tím elektronických prihlášok MŠVVaM SR Tento email bol generovaný automaticky portálom "
+            f"Elektronické prihlášky do škôl, ktorý je v správe Ministerstva školstva, výskumu, "
+            f"vývoja a mládeže Slovenskej republiky. Neodpovedajte naň."
+        ),
+    ]
+
+
+@pytest.mark.regres1kolo
+@pytest.mark.regres2kolo
+def test_vytvorenie_konfliktu_na_MŠ(page: Page, person_data) -> None:
+    data = person_data
+    helper = Helper()
+
+    _create_electronic_ms_application(page, data)
+    _create_paper_ms_application(page, data, helper)
+
 
 @pytest.mark.regres1kolo
 @pytest.mark.regres2kolo
@@ -64,67 +223,106 @@ def test_vyriesenie_konfliktu_na_MS(page: Page, person_data) -> None:
     helper = Helper()
     mail = Mail()
     login = LoginPage(page)
-    logout = LogoutPage(page)
     prihlaska = PrihlaskaMS(page)
-    konflikt = konfliktMS(page)
+    konflikt = KonfliktMS(page)
+
     login.login_as_riaditel(username_riad, password_riad, "910021626")
     prihlaska.vyhladaj_prihlasku(data.meno, data.priezvisko)
-    expect(page.locator("#info-panel-red-prihlaska-v-konflikte-riad-zs")).to_contain_text("Táto prihláška je v stave - V konflikte.")
-    expect(page.locator("#info-panel-red-prihlaska-v-konflikte-riad-zs")).to_contain_text("Vyzvite zákonného zástupcu na výber jednej verzie.")
-    expect(page.locator("#info-panel-red-prihlaska-v-konflikte-riad-zs")).to_contain_text("Následne vyriešte konflikt označením jednej prihlášky ako aktívnej.")
-    typPrihlasky = page.locator("#detail-prihlasky-riad-MS-ZS-content").text_content()
-    id = page.locator("div.prihlaskaIdentifikator").text_content()
-    identifikator = page.locator("div.prihlaska-v-konflikte-item").locator("div").nth(0).text_content()
-    identifikator = identifikator[1:]
-    identifikator1 = page.locator("div.prihlaska-v-konflikte-item").locator("div").nth(2).text_content()
-    identifikator1 = identifikator1[1:]
+
+    conflict_panel = page.locator("#info-panel-red-prihlaska-v-konflikte-riad-zs")
+    _expect_text(conflict_panel, "Táto prihláška je v stave - V konflikte.", "Chýba informácia, že prihláška je v konflikte.")
+    _expect_text(conflict_panel, "Vyzvite zákonného zástupcu na výber jednej verzie.", "Chýba výzva na kontaktovanie zákonného zástupcu.")
+    _expect_text(conflict_panel, "Následne vyriešte konflikt označením jednej prihlášky ako aktívnej.", "Chýba popis ďalšieho kroku riešenia konfliktu.")
+
+    typ_prihlasky = page.locator("#detail-prihlasky-riad-MS-ZS-content").text_content()
+    identifikator = page.locator("div.prihlaska-v-konflikte-item").locator("div").nth(0).text_content()[1:]
+    identifikator1 = page.locator("div.prihlaska-v-konflikte-item").locator("div").nth(2).text_content()[1:]
+
     konflikt.click_on_vyzva_na_vyriesenie_konfliktu()
-    expect(page.locator("#vyzva-riesenie-konfliktu-title")).to_contain_text("Výzva na riešenie konfliktu")
-    expect(page.locator("body")).to_contain_text("Pre dieťa existuje viac ako jedna prihláška. Vyzvite zákonných zástupcov k výberu jednej prihlášky prostredníctvom emailovej notifikácie.")
-    expect(page.locator("body")).to_contain_text("Peter Fodrok")
-    expect(page.locator("body")).to_contain_text("Mária Bartošová")
+
+    _expect_text(
+        page.locator("#vyzva-riesenie-konfliktu-title"),
+        "Výzva na riešenie konfliktu",
+        "Nezobrazil sa dialóg Výzva na riešenie konfliktu."
+    )
+    _expect_text(
+        page.locator("body"),
+        "Pre dieťa existuje viac ako jedna prihláška.",
+        "V dialógu výzvy chýba informácia o viacerých prihláškach."
+    )
+    _expect_text(page.locator("body"), "Peter Fodrok", "V dialógu výzvy chýba meno Peter Fodrok.")
+    _expect_text(page.locator("body"), "Mária Bartošová", "V dialógu výzvy chýba meno Mária Bartošová.")
+
     konflikt.odoslat_vyzvu_na_vyriesenie_konfliktu()
 
     vyzva_konflikt = mail.get_last_email_text("imap.gmail.com", mailuser, mailpw)
-    vyzva_konflikt = helper.cleanup_email_text(vyzva_konflikt)
-    
-    expected = (
-    f"Vážený/á pán/pani Peter Fodrok, v systéme bolo zistené, že pre žiaka {data.meno} {data.priezvisko} nar. {helper.rc_to_datum_narodenia(data.rodne_cislo)} "
-    f"boli podané viaceré prihlášky. Riaditeľ školy Materská škola pre AT Vás týmto vyzýva, aby ste ho bezodkladne kontaktovali a informovali, ktorú prihlášku si želáte ponechať ako platnú. Sprievodná správa od riaditeľa: Výzva na vyriešenie konfliktu. Bez vyriešenia tohto konfliktu nebudú prihlášky ďalej spracované. S pozdravom Tím elektronických prihlášok MŠVVaM SR Tento email bol generovaný automaticky portálom Elektronické prihlášky do škôl, ktorý je v správe Ministerstva školstva, výskumu, vývoja a mládeže Slovenskej republiky. Neodpovedajte naň."
-    )
-    expected1 = (
-    f"Vážený/á pán/pani Mária Bartošová, v systéme bolo zistené, že pre žiaka {data.meno} {data.priezvisko} nar. {helper.rc_to_datum_narodenia(data.rodne_cislo)} "
-    f"boli podané viaceré prihlášky. Riaditeľ školy Materská škola pre AT Vás týmto vyzýva, aby ste ho bezodkladne kontaktovali a informovali, ktorú prihlášku si želáte ponechať ako platnú. Sprievodná správa od riaditeľa: Výzva na vyriešenie konfliktu. Bez vyriešenia tohto konfliktu nebudú prihlášky ďalej spracované. S pozdravom Tím elektronických prihlášok MŠVVaM SR Tento email bol generovaný automaticky portálom Elektronické prihlášky do škôl, ktorý je v správe Ministerstva školstva, výskumu, vývoja a mládeže Slovenskej republiky. Neodpovedajte naň."
-    )
-    assert vyzva_konflikt in [expected, expected1]
+    vyzva_konflikt = _normalize_email_text(vyzva_konflikt, helper)
 
-    expect(page.locator("#duplicitne-prihlasky")).to_contain_text("Riaditeľ školy Materská škola pre AT zaslal výzvu na riešenie konfliktu prihlášok.", timeout=10000)
+    _assert_email_in_options(
+        vyzva_konflikt,
+        _build_conflict_notice_options(data, helper),
+        "Obsah e-mailu s výzvou na vyriešenie konfliktu nezodpovedá očakávaniu."
+    )
+
+    _expect_text(
+        page.locator("#duplicitne-prihlasky"),
+        "Riaditeľ školy Materská škola pre AT zaslal výzvu na riešenie konfliktu prihlášok.",
+        "Po odoslaní výzvy sa nezobrazila informácia o zaslanej výzve."
+    )
+
     konflikt.click_on_vyriesenie_konfliktu()
-    expect(page.locator("#vyriesit-konflikt-title")).to_contain_text("Vyriešiť konflikt")
-    expect(page.locator("body")).to_contain_text("Po označení prihlášky ako aktívnej sa automaticky zneaktívnia všetky duplicitné prihlášky pre toto dieťa na všetkých školách.")
+
+    _expect_text(
+        page.locator("#vyriesit-konflikt-title"),
+        "Vyriešiť konflikt",
+        "Nezobrazil sa dialóg Vyriešiť konflikt."
+    )
+    _expect_text(
+        page.locator("body"),
+        "Po označení prihlášky ako aktívnej sa automaticky zneaktívnia všetky duplicitné prihlášky",
+        "V dialógu riešenia konfliktu chýba vysvetlenie dôsledku označenia aktívnej prihlášky."
+    )
+
     konflikt.odoslat_vyriesenie_konfliktu("Vyriešenie konfliktu.")
+
     vyriesenie_konflikt = mail.get_last_email_text("imap.gmail.com", mailuser, mailpw)
-    vyriesenie_konflikt = helper.cleanup_email_text(vyriesenie_konflikt)
+    vyriesenie_konflikt = _normalize_email_text(vyriesenie_konflikt, helper)
 
-    if typPrihlasky == "Elektronicky":
-        #identifikator1 = helper.inkrementuj_identifikator(identifikator)
-        expected = f"Vážený/á pán/pani Mária Bartošová, Prihláška {identifikator} bola v konflikte s prihláškou/prihláškami {identifikator}, {identifikator1}. Konflikt bol vyriešený . V systéme bude ďalej evidovaná len prihláška {identifikator}. S pozdravom Tím elektronických prihlášok MŠVVaM SR Tento email bol generovaný automaticky portálom Elektronické prihlášky do škôl, ktorý je v správe Ministerstva školstva, výskumu, vývoja a mládeže Slovenskej republiky. Neodpovedajte naň."
-        expected1 = f"Vážený/á pán/pani Peter Fodrok, riaditeľ školy Materská škola pre AT vyriešil konflikt viacerých prihlášok podaných pre žiaka {data.meno} {data.priezvisko} nar. {helper.rc_to_datum_narodenia(data.rodne_cislo)}. Ako aktívna bola označená prihláška s identifikátorom {identifikator}, ktorú podal/podala Mária Bartošová. Ostatné prihlášky boli označené ako “Konflikt - neaktívna” a nebudú ďalej spracované. Stav prihlášky si môžete overiť po prihlásení do portálu Elektronické prihlášky: Link na prihlásenie S pozdravom Tím elektronických prihlášok MŠVVaM SR Tento email bol generovaný automaticky portálom Elektronické prihlášky do škôl, ktorý je v správe Ministerstva školstva, výskumu, vývoja a mládeže Slovenskej republiky. Neodpovedajte naň."
-        assert vyriesenie_konflikt in [expected, expected1]
-        
-        expect(page.locator("#info-panel-blue-prihlaska-aktivna")).to_contain_text("Prihláška bola označená ako aktívna riaditeľom školy 910021626 Materská škola pre AT")
-        expect(page.locator("#detail-prihlasky-riad-MS-ZS-content")).to_contain_text("Podaná")
-    else:
-        #identifikator1 = helper.dekrementuj_identifikator(identifikator)
-        #identifikator2 = helper.inkrementuj_identifikator(identifikator)
-        expected = f"Vážený/á pán/pani Mária Bartošová, Prihláška {identifikator1} bola v konflikte s prihláškou/prihláškami {identifikator1}, {identifikator}. Konflikt bol vyriešený . V systéme bude ďalej evidovaná len prihláška {identifikator1}. S pozdravom Tím elektronických prihlášok MŠVVaM SR Tento email bol generovaný automaticky portálom Elektronické prihlášky do škôl, ktorý je v správe Ministerstva školstva, výskumu, vývoja a mládeže Slovenskej republiky. Neodpovedajte naň."
-        expected1 = f"Vážený/á pán/pani Peter Fodrok, riaditeľ školy Materská škola pre AT vyriešil konflikt viacerých prihlášok podaných pre dieťa {data.meno} {data.priezvisko} nar. {helper.rc_to_datum_narodenia(data.rodne_cislo)}. Ako aktívna bola označená prihláška s identifikátorom {identifikator1}, ktorú podal/podala Mária Bartošová. Ostatné prihlášky boli označené ako “Konflikt - neaktívna” a nebudú ďalej spracované. Stav prihlášky si môžete overiť po prihlásení do portálu Elektronické prihlášky: Link na prihlásenie S pozdravom Tím elektronických prihlášok MŠVVaM SR Tento email bol generovaný automaticky portálom Elektronické prihlášky do škôl, ktorý je v správe Ministerstva školstva, výskumu, vývoja a mládeže Slovenskej republiky. Neodpovedajte naň."
-        expected2 = f"Vážený/á pán/pani Peter Fodrok, riaditeľ školy Materská škola pre AT vyriešil konflikt viacerých prihlášok podaných pre dieťa {data.meno} {data.priezvisko} nar. {helper.rc_to_datum_narodenia(data.rodne_cislo)}. Ako aktívna bola označená prihláška s identifikátorom {identifikator}, ktorú podal/podala Mária Bartošová. Ostatné prihlášky boli označené ako “Konflikt - neaktívna” a nebudú ďalej spracované. Stav prihlášky si môžete overiť po prihlásení do portálu Elektronické prihlášky: Link na prihlásenie S pozdravom Tím elektronických prihlášok MŠVVaM SR Tento email bol generovaný automaticky portálom Elektronické prihlášky do škôl, ktorý je v správe Ministerstva školstva, výskumu, vývoja a mládeže Slovenskej republiky. Neodpovedajte naň."
-        expected3 = f"Vážený/á pán/pani Mária Bartošová, Prihláška {identifikator} bola v konflikte s prihláškou/prihláškami {identifikator}, {identifikator1}. Konflikt bol vyriešený . V systéme bude ďalej evidovaná len prihláška {identifikator}. S pozdravom Tím elektronických prihlášok MŠVVaM SR Tento email bol generovaný automaticky portálom Elektronické prihlášky do škôl, ktorý je v správe Ministerstva školstva, výskumu, vývoja a mládeže Slovenskej republiky. Neodpovedajte naň."
+    _assert_email_in_options(
+        vyriesenie_konflikt,
+        _build_resolution_options(typ_prihlasky, identifikator, identifikator1, data, helper),
+        "Obsah e-mailu o vyriešení konfliktu nezodpovedá očakávaniu."
+    )
 
-        assert vyriesenie_konflikt in [expected, expected1, expected2, expected3]
+    _expect_text(
+        page.get_by_role("strong"),
+        "Duplicita prihlášok úspešne vyriešená",
+        "Chýba zvýraznená hláška o úspešnom vyriešení duplicity."
+    )
+    _expect_text(
+        page.locator("#info-panel-green-konflikt-vyrieseny"),
+        "Duplicita prihlášok úspešne vyriešená",
+        "Chýba zelený panel o vyriešení duplicity."
+    )
+    _expect_text(
+        page.locator("#info-panel-green-konflikt-vyrieseny"),
+        "Všetky duplicitné prihlášky boli zneaktívnené.",
+        "V zelenom paneli chýba informácia o zneaktívnení duplicitných prihlášok."
+    )
+    _expect_text(
+        page.locator("#duplicitne-prihlasky"),
+        f"Pre dieťa {data.meno} {data.priezvisko} bol vyriešený konflikt.",
+        "V detaile duplicity chýba informácia o vyriešenom konflikte."
+    )
 
-    expect(page.get_by_role("strong")).to_contain_text("Duplicita prihlášok úspešne vyriešená")
-    expect(page.locator("#info-panel-green-konflikt-vyrieseny")).to_contain_text("Duplicita prihlášok úspešne vyriešenáVšetky duplicitné prihlášky boli zneaktívnené.")
-    expect(page.locator("#duplicitne-prihlasky")).to_contain_text("Pre dieťa "+data.meno+" "+data.priezvisko+" bol vyriešený konflikt.")
-    
+    if typ_prihlasky == "Elektronicky":
+        _expect_text(
+            page.locator("#info-panel-blue-prihlaska-aktivna"),
+            "Prihláška bola označená ako aktívna riaditeľom školy 910021626 Materská škola pre AT",
+            "Chýba modrý panel o označení aktívnej prihlášky."
+        )
+        _expect_text(
+            page.locator("#detail-prihlasky-riad-MS-ZS-content"),
+            "Podaná",
+            "Po vyriešení konfliktu nemá aktívna prihláška stav 'Podaná'."
+        )

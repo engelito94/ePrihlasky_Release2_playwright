@@ -1,20 +1,43 @@
-import re
 from playwright.sync_api import Page
+from pages.base_page import BasePage
 
-class konfliktMS:
+
+class KonfliktMS(BasePage):
+    DEFAULT_VYZVA_TEXT = "Výzva na vyriešenie konfliktu."
+
     def __init__(self, page: Page):
-        self.page = page
+        super().__init__(page)
 
     def click_on_vyzva_na_vyriesenie_konfliktu(self):
-        self.page.get_by_role("button", name="Vyzvať na riešenie konfliktu").click()
+        self._safe_click(
+            self.page.get_by_role("button", name="Vyzvať na riešenie konfliktu"),
+            "Vyzvať na riešenie konfliktu"
+        )
 
     def odoslat_vyzvu_na_vyriesenie_konfliktu(self):
-        self.page.get_by_role("textbox", name="Sprievodná správa: *").fill("Výzva na vyriešenie konfliktu.")
-        self.page.get_by_role("button", name="Odoslať výzvu").click()
+        self._safe_fill(
+            self.page.get_by_role("textbox", name="Sprievodná správa: *"),
+            self.DEFAULT_VYZVA_TEXT,
+            "Sprievodná správa k výzve"
+        )
+        self._safe_click(
+            self.page.get_by_role("button", name="Odoslať výzvu"),
+            "Odoslať výzvu"
+        )
 
     def click_on_vyriesenie_konfliktu(self):
-        self.page.get_by_role("button", name="Vyriešiť konflikt").click()
+        self._safe_click(
+            self.page.get_by_role("button", name="Vyriešiť konflikt"),
+            "Vyriešiť konflikt"
+        )
 
     def odoslat_vyriesenie_konfliktu(self, text: str):
-        self.page.get_by_role("textbox", name="Sprievodná správa: *").fill(text)
-        self.page.locator("button").filter(has_text=re.compile(r"^Vyriešiť konflikt$")).click()
+        self._safe_fill(
+            self.page.get_by_role("textbox", name="Sprievodná správa: *"),
+            text,
+            "Sprievodná správa k vyriešeniu konfliktu"
+        )
+        self._safe_click(
+            self.page.locator("button").filter(has_text=r"^Vyriešiť konflikt$"),
+            "Odoslať vyriešenie konfliktu"
+        )
