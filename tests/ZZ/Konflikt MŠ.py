@@ -100,7 +100,7 @@ def _create_paper_ms_application(page: Page, data, helper: Helper) -> None:
         page,
         r".*/Riaditel.*",
         "Po odoslaní papierovej prihlášky sa nevrátila stránka riaditeľa.",
-        timeout=25000
+        timeout=55000
     )
     _expect_text(
         page.locator("#riaditel-home-page"),

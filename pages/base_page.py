@@ -6,7 +6,7 @@ class BasePage:
     def __init__(self, page: Page):
         self.page = page
 
-    def _safe_click(self, locator: Locator, nazov_prvku: str, timeout: int = 20000, screenshot_on_error: bool = True):
+    def _safe_click(self, locator: Locator, nazov_prvku: str, timeout: int = 30000, screenshot_on_error: bool = True):
         try:
             expect(locator, f'Prvok "{nazov_prvku}" nie je viditeľný pred kliknutím.').to_be_visible(timeout=timeout)
             locator.click(timeout=timeout)

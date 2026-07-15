@@ -36,8 +36,10 @@ class PapierovaPrihlaskaMS(BasePage):
         )
 
     def _potvrd_existujucu_prihlasku_ak_treba(self):
-        hlaska = self.page.get_by_text("Pre tohto žiaka už existuje prihláška.", exact=True)
-        if hlaska.is_visible():
+        hlaska = self.page.get_by_text("Pre toto dieťa už existuje prihláška.", exact=True)
+        self.page.wait_for_timeout(2000)
+        hlaska1 = self.page.get_by_text("Prihláška už existuje", exact=True)
+        if hlaska.is_visible() or hlaska1.is_visible():
             self._safe_click(
                 self.page.locator("button.btn-confirm.govuk-button.govuk-button__large.last-focusable"),
                 "Potvrdiť existujúcu prihlášku"

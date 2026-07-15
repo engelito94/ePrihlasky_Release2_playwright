@@ -38,6 +38,6 @@ class KonfliktMS(BasePage):
             "Sprievodná správa k vyriešeniu konfliktu"
         )
         self._safe_click(
-            self.page.locator("button").filter(has_text=r"^Vyriešiť konflikt$"),
+            self.page.locator("button.btn-vyriesit-konflikt.govuk-button.govuk-button__basic.last-focusable"),
             "Odoslať vyriešenie konfliktu"
         )

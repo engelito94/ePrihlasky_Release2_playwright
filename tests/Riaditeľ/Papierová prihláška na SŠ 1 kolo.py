@@ -155,7 +155,7 @@ def test_pridanie_papierovej_prihlasky_SS_1_kolo(page: Page) -> None:
         "Po odoslaní sa nezobrazila úspešná hláška o pridaní prihlášky."
     )
 
-    prihlaska.najdi_prihlasku(data.meno, data.priezvisko)
+    prihlaska.najdi_prihlasku_1_kolo(data.meno, data.priezvisko)
 
     _expect_text(
         page.locator("#sub-riaditel-prihlasky"),

@@ -9,3 +9,4 @@ playwright/.auth/
 allure-report/
 allure-results/
 data/*.txt
+AGENTS.md
