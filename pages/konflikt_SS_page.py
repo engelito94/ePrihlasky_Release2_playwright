@@ -84,12 +84,13 @@ class KofliktSS(BasePage):
             "Vyriešiť konflikt"
         )
 
-    def click_on_odoslat_konfikt(self, text: str):
+    def click_on_odoslat_konflikt(self, text: str):
         self._safe_fill(
             self.page.locator("#textarea-sprievodnaSpravaTextarea"),
             text,
             "Sprievodná správa k vyriešeniu konfliktu"
         )
+        self.page.wait_for_timeout(3000)
         self._safe_click(
             self.page.locator("button.btn-vyriesit-konflikt.govuk-button.govuk-button__basic.last-focusable"),
             "Odoslať vyriešenie konfliktu"

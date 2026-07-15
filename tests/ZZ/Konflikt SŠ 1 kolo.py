@@ -257,7 +257,7 @@ def test_vyriesenie_konfliktu_1_kolo(page: Page) -> None:
         "V dialógu riešenia konfliktu chýba popis dôsledku označenia aktívnej prihlášky."
     )
 
-    konflikt.click_on_odoslat_konfikt("Vyriešiť konflikt.")
+    konflikt.click_on_odoslat_konflikt("Vyriešiť konflikt.")
 
     vyriesenie_konflikt = mail.get_last_email_text("imap.gmail.com", mailuser, mailpw)
     vyriesenie_konflikt = helper.cleanup_email_text(vyriesenie_konflikt)
