@@ -80,6 +80,7 @@ class PrilohySS(BasePage):
         self._zorad_a_otvor_poslednu_prihlasku("Zobraziť poslednú prihlášku pre 1. kolo")
 
     def vyziadaj_prilohu_na_poslednej_prihlaske(self):
+        self.page.wait_for_timeout(3000)
         self._safe_click(
             self.page.get_by_role("button", name="Vyžiadať prílohu"),
             "Vyžiadať prílohu"

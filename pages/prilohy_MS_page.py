@@ -12,6 +12,7 @@ class PrilohyMS(BasePage):
 
     def vyziadanie_prilohy_MS(self):
         self.page.wait_for_load_state("networkidle")
+        self.page.wait_for_timeout(3000)
 
         self._safe_click(
             self.page.get_by_role("button", name="Vyžiadať prílohu"),
@@ -34,6 +35,7 @@ class PrilohyMS(BasePage):
 
     def odvolanie_prilohy_MS(self):
         self.page.wait_for_load_state("networkidle")
+        self.page.wait_for_timeout(4000)
 
         self._safe_click(
             self.page.get_by_role("button", name="Odvolať žiadosť"),
@@ -46,6 +48,7 @@ class PrilohyMS(BasePage):
 
     def pridat_prilohu_MS(self):
         self.page.wait_for_load_state("networkidle")
+        self.page.wait_for_timeout(3000)
 
         self._safe_click(
             self.page.get_by_role("link", name="Pridať prílohy"),
