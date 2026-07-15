@@ -51,7 +51,7 @@ class PrilohyMS(BasePage):
         self.page.wait_for_timeout(3000)
 
         self._safe_click(
-            self.page.get_by_role("link", name="Pridať prílohy"),
+            self.page.get_by_role("link", name="Pridať prílohy").first,
             "Pridať prílohy"
         )
         self._safe_click(

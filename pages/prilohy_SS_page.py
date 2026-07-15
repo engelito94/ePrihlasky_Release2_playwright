@@ -119,7 +119,7 @@ class PrilohySS(BasePage):
         self.page.wait_for_load_state("networkidle")
 
         self._safe_click(
-            self.page.get_by_role("link", name="Pridať prílohy"),
+            self.page.get_by_role("link", name="Pridať prílohy").first,
             "Pridať prílohy"
         )
         self._safe_click(

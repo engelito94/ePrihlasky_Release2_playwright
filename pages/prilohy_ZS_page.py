@@ -48,7 +48,7 @@ class PrilohyZS(BasePage):
 
     def pridat_prilohu(self):
         self._safe_click(
-            self.page.get_by_role("link", name="Pridať prílohy"),
+            self.page.get_by_role("link", name="Pridať prílohy").first,
             "Pridať prílohy"
         )
 
