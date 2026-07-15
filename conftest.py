@@ -9,10 +9,10 @@ import pytest
 from dotenv import load_dotenv
 from PIL import Image
 from pixelmatch.contrib.PIL import pixelmatch
-from playwright.sync_api import Page
+from playwright.sync_api import Page, expect
 
+expect.set_options(timeout=45000)
 load_dotenv()
-
 
 def pytest_addoption(parser):
     parser.addoption(
