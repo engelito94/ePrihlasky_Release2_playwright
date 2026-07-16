@@ -426,6 +426,11 @@ class PrihlaskaSS(BasePage):
             self.page.locator("#prilohyUploadZone5").get_by_role("link", name="Vybrať súbor"),
             "Príloha - Olympiáda alebo súťaž Zumba"
         )
+        self._upload_prilohy(
+            "Potvrdenie o zdravotnej spôsobilosti (stredná škola) Nenahrané Nenahrané Nahrané",
+            self.page.locator("#prilohyUploadZone6").get_by_role("link", name="Vybrať súbor"),
+            "Príloha - Potvrdenie o zdravotnej spôsobilosti (stredná škola)"
+        )
 
         self._click_dalej("Ďalej - prílohy")
 

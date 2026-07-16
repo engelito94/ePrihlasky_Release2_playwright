@@ -7,6 +7,8 @@ from pages.odbory_page import Odbory
 
 riad_username = os.getenv("EPRIHLASKY_SEC_RIADITEL_USERNAME")
 riad_password = os.getenv("EPRIHLASKY_SEC_RIADITEL_PASSWORD")
+riad_username1 = os.getenv("EPRIHLASKY_RIADITEL_USERNAME")
+riad_password1 = os.getenv("EPRIHLASKY_RIADITEL_PASSWORD")
 
 
 @pytest.mark.regres2kolo
@@ -77,7 +79,7 @@ def test_pridanie_a_vymazanie_odboru_1_kolo(page: Page) -> None:
     login = LoginPage(page)
     odbor = Odbory(page)
 
-    login.login_as_riaditel(riad_username, riad_password, "910014291")
+    login.login_as_riaditel(riad_username1, riad_password1, "910021685")
     odbor.pridaj_odbor_1_kolo()
 
     expect(

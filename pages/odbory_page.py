@@ -8,7 +8,7 @@ class Odbory(BasePage):
     KAPACITA_2_KOLO = "100"
 
     KAPACITA_1_KOLO = "55"
-    DLZKA_STUDIA = "20"
+    DLZKA_STUDIA = "80"
     FORMA_STUDIA = "101"
     ICO_ZAMESTNAVATELA = "31385401"
     KAPACITA_DUAL = "12"
@@ -71,8 +71,8 @@ class Odbory(BasePage):
             "Pridať odbor"
         )
         self._safe_click(
-            self.page.get_by_text("cestovný ruch 6314N00 •"),
-            "cestovný ruch 6314N00"
+            self.page.get_by_text("matematika 1113311 •"),
+            "matematika 1113311"
         )
         self._safe_click(
             self.page.locator(".checkmark").first,
