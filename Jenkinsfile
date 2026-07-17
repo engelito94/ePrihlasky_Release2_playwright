@@ -8,9 +8,24 @@ pipeline {
 
     parameters {
         choice(
+            name: 'RUN_MODE',
+            choices: ['suite', 'single'],
+            description: 'suite = spusti marker, single = spusti jeden konkretny test'
+        )
+        choice(
             name: 'TEST_SUITE',
             choices: ['regres1kolo', 'regres2kolo'],
             description: 'Vyber, ktory regresny marker sa ma spustit'
+        )
+        string(
+            name: 'TEST_FILTER',
+            defaultValue: '',
+            description: 'Pri RUN_MODE=single zadaj presny nodeid testu alebo -k filter, napr. tests\\subor.py::test_nazov'
+        )
+        choice(
+            name: 'SINGLE_MODE',
+            choices: ['nodeid', 'kexpr'],
+            description: 'nodeid = presna cesta k testu, kexpr = pytest -k filter'
         )
         string(
             name: 'EPRIHLASKY_TEST_URL_PARAM',
@@ -57,7 +72,25 @@ if not exist .venv (
         stage('Run tests') {
             steps {
                 catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
-                    bat """
+                    script {
+                        def pytestTarget = ""
+                        def pytestSelector = ""
+
+                        if (params.RUN_MODE == 'single') {
+                            if (!params.TEST_FILTER?.trim()) {
+                                error("RUN_MODE=single, ale TEST_FILTER je prazdny.")
+                            }
+
+                            if (params.SINGLE_MODE == 'nodeid') {
+                                pytestTarget = params.TEST_FILTER.trim()
+                            } else {
+                                pytestSelector = "-k \"${params.TEST_FILTER.trim()}\""
+                            }
+                        } else {
+                            pytestSelector = "-m \"${params.TEST_SUITE}\""
+                        }
+
+                        bat """
 if exist reports\\screenshots rmdir /s /q reports\\screenshots
 if not exist reports mkdir reports
 if not exist reports\\screenshots mkdir reports\\screenshots
@@ -79,8 +112,9 @@ set GMAIL_APP_PASSWORD=%GMAIL_MAIN_PSW%
 set GMAIL_SEC_USERNAME=%GMAIL_SEC_USR%
 set GMAIL_SEC_APP_PASSWORD=%GMAIL_SEC_PSW%
 
-.venv\\Scripts\\pytest -m "${params.TEST_SUITE}" --screenshot=only-on-failure --full-page-screenshot --junitxml=reports\\junit.xml
+.venv\\Scripts\\pytest ${pytestTarget} ${pytestSelector} --screenshot=only-on-failure --full-page-screenshot --junitxml=reports\\junit.xml
 """
+                    }
                 }
             }
         }
