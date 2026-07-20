@@ -208,7 +208,7 @@ def _build_resolution_options(
 
 @pytest.mark.regres1kolo
 @pytest.mark.regres2kolo
-def test_vytvorenie_konfliktu_na_MŠ(page: Page, person_data) -> None:
+def test_vytvorenie_konfliktu_na_MS(page: Page, person_data) -> None:
     data = person_data
     helper = Helper()
 
