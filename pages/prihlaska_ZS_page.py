@@ -18,7 +18,7 @@ class PrihlaskaZS(BasePage):
 
     def _click_dalej(self, nazov_kroku: str):
         self._safe_click(
-            self.page.get_by_role("button", name="Ďalej"),
+            self.page.get_by_role("button", name="Ďalej", exact=True),
             nazov_kroku
         )
 

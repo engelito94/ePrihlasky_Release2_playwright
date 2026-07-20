@@ -161,7 +161,7 @@ def test_profil_skoly_SS(page: Page) -> None:
     _open_public_ss_profile(verejna_zona)
     _expect_ss_public_profile_first_version(page)
 
-    page.get_by_role("button", name="Zavrieť").click()
+    page.locator("button").filter(has_text="Zavrieť").last.click()
 
     _update_ss_school_profile_second_version(page, login_page, sprava_skoly)
     logout_page.logout()

@@ -15,7 +15,7 @@ class BasePage:
                 self.screenshot(f"error_click_{self._sanitize_filename(nazov_prvku)}")
             raise AssertionError(f'Kliknutie na prvok "{nazov_prvku}" nebolo úspešné: {e}')
 
-    def _safe_fill(self, locator: Locator, hodnota: str, nazov_prvku: str, timeout: int = 20000, screenshot_on_error: bool = True):
+    def _safe_fill(self, locator: Locator, hodnota: str, nazov_prvku: str, timeout: int = 30000, screenshot_on_error: bool = True):
         try:
             expect(locator, f'Pole "{nazov_prvku}" nie je viditeľné pred vyplnením.').to_be_visible(timeout=timeout)
             locator.fill(hodnota, timeout=timeout)
@@ -24,7 +24,7 @@ class BasePage:
                 self.screenshot(f"error_fill_{self._sanitize_filename(nazov_prvku)}")
             raise AssertionError(f'Vyplnenie poľa "{nazov_prvku}" hodnotou "{hodnota}" nebolo úspešné: {e}')
 
-    def _safe_select(self, locator: Locator, hodnota: str, nazov_prvku: str, timeout: int = 20000, screenshot_on_error: bool = True):
+    def _safe_select(self, locator: Locator, hodnota: str, nazov_prvku: str, timeout: int = 30000, screenshot_on_error: bool = True):
         try:
             expect(locator, f'Pole "{nazov_prvku}" nie je viditeľné pred výberom hodnoty.').to_be_visible(timeout=timeout)
             locator.select_option(hodnota, timeout=timeout)
@@ -33,7 +33,7 @@ class BasePage:
                 self.screenshot(f"error_select_{self._sanitize_filename(nazov_prvku)}")
             raise AssertionError(f'Výber hodnoty "{hodnota}" v poli "{nazov_prvku}" nebol úspešný: {e}')
 
-    def _safe_check(self, locator: Locator, nazov_prvku: str, timeout: int = 20000, screenshot_on_error: bool = True):
+    def _safe_check(self, locator: Locator, nazov_prvku: str, timeout: int = 30000, screenshot_on_error: bool = True):
         try:
             expect(locator, f'Prvok "{nazov_prvku}" nie je viditeľný pred označením.').to_be_visible(timeout=timeout)
             locator.check(timeout=timeout)

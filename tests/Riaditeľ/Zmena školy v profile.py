@@ -17,7 +17,7 @@ def _expect_text(locator, text: str, message: str) -> None:
 def _change_school(page: Page, school_name: str) -> None:
     school_input = page.get_by_role("textbox", name="Škola *")
     school_input.click()
-    page.get_by_text(school_name).click()
+    page.get_by_text(school_name, exact=True).click()
     page.get_by_role("button", name="Zmeniť školu").click()
 
 
