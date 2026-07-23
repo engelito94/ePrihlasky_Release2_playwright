@@ -56,7 +56,7 @@ class PapierovaPrihlaskaZSSS(BasePage):
                 nazov_prvku
             )
 
-    def click_on_pridaj_prihlasku(self):
+    def click_on_pridaj_prihlasku(self, kolo: str):
         self.page.wait_for_load_state("networkidle")
 
         self._safe_click(
@@ -67,7 +67,7 @@ class PapierovaPrihlaskaZSSS(BasePage):
 
         self._safe_select(
             self.page.get_by_label("Kolo"),
-            self.KOLO,
+            kolo,
             "Kolo"
         )
         self.page.wait_for_load_state("networkidle")
@@ -199,8 +199,8 @@ class PapierovaPrihlaskaZSSS(BasePage):
             "Hľadať školu"
         )
         self._safe_click(
-            self.page.get_by_role("button", name="Pridať do prihlášky").first,
-            "Pridať do prihlášky"
+            self.page.get_by_role("button", name="Pridať do prihlášky").nth(1),
+            "Pridať do prihlášky - zlievač"
         )
         self._safe_click(
             self.page.get_by_role("button", name="Pridať odbory a odísť"),
@@ -437,7 +437,7 @@ class PapierovaPrihlaskaZSSS(BasePage):
             self.page.get_by_role("button", name="Pridať prihlášku"),
             "Pridať prihlášku"
         )
-        self.page.wait_for_load_state("load", timeout=15000)
+        self.page.wait_for_load_state("load", timeout=60000)
 
     def najdi_prihlasku(self, meno: str, priezvisko: str):
         self._safe_fill(

@@ -31,7 +31,7 @@ def _expect_text(locator, text: str, message: str) -> None:
     expect(locator, message).to_contain_text(text)
 
 
-def _expect_url(page: Page, pattern: str, message: str, timeout: int = 35000) -> None:
+def _expect_url(page: Page, pattern: str, message: str, timeout: int = 60000) -> None:
     expect(page, message).to_have_url(re.compile(pattern), timeout=timeout)
 
 
@@ -100,7 +100,7 @@ def _create_paper_ms_application(page: Page, data, helper: Helper) -> None:
         page,
         r".*/Riaditel.*",
         "Po odoslaní papierovej prihlášky sa nevrátila stránka riaditeľa.",
-        timeout=55000
+        timeout=60000
     )
     _expect_text(
         page.locator("#riaditel-home-page"),

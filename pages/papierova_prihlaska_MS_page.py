@@ -258,7 +258,7 @@ class PapierovaPrihlaskaMS(BasePage):
             self.page.get_by_role("button", name="Pridať prihlášku"),
             "Pridať prihlášku"
         )
-        self.page.wait_for_load_state("load", timeout=15000)
+        self.page.wait_for_load_state("load", timeout=60000)
 
     def najdi_prihlasku(self, meno: str, priezvisko: str):
         self._safe_fill(

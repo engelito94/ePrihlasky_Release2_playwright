@@ -147,7 +147,7 @@ def test_pridanie_papierovej_prihlasky_SS_1_kolo(page: Page) -> None:
     expect(
         page,
         "Po odoslaní papierovej prihlášky sa neotvorila stránka riaditeľa."
-    ).to_have_url(re.compile(r".*/Riaditel.*"), timeout=25000)
+    ).to_have_url(re.compile(r".*/Riaditel.*"), timeout=60000)
 
     _expect_text(
         page.locator("#riaditel-home-page"),

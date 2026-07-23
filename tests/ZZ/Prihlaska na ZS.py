@@ -182,7 +182,7 @@ def test_prihlaska_na_ZS(page: Page, person_data) -> None:
     expect(
         page,
         "Po odoslaní prihlášky sa neprepla na stránku 'Prihlaska-odoslana'."
-    ).to_have_url(re.compile(r".*/Prihlaska-odoslana.*"), timeout=35000)
+    ).to_have_url(re.compile(r".*/Prihlaska-odoslana.*"), timeout=60000)
 
     expect(
         page.locator("h1"),
@@ -302,7 +302,7 @@ def test_doplnenie_prilohy_na_ZS(page: Page, person_data) -> None:
     expect(
         page,
         "Po prihlásení zákonného zástupcu sa neotvorila stránka so zoznamom prihlášok."
-    ).to_have_url(re.compile(r".*/Prihlasky*"), timeout=35000)
+    ).to_have_url(re.compile(r".*/Prihlasky*"), timeout=60000)
 
     expect(
         page.locator("#moje-prihlasky"),

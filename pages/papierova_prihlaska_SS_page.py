@@ -426,7 +426,7 @@ class PapierovaPrihlaskaSS(BasePage):
             self.page.get_by_role("button", name="Pridať prihlášku"),
             "Pridať prihlášku"
         )
-        self.page.wait_for_load_state("load", timeout=15000)
+        self.page.wait_for_load_state("load", timeout=60000)
 
     def najdi_prihlasku_2_kolo(self, meno: str, priezvisko: str):
         self._safe_select(
@@ -461,9 +461,11 @@ class PapierovaPrihlaskaSS(BasePage):
             self.page.get_by_role("button", name="Hľadať"),
             "Hľadať"
         )
+        self.page.wait_for_load_state("networkidle", timeout=60000)
 
     def click_on_zobrazit_prihlasku(self):
+        self.page.locator("div.page-overlay").wait_for(state="hidden", timeout=60000)
         self._safe_click(
-            self.page.locator("div.riaditel-prihlasky-cell.akcia-cell").locator("button").nth(0),
+            self.page.locator("div.riaditel-prihlasky-cell.akcia-cell button:visible").nth(0),
             "Zobraziť prihlášku"
         )

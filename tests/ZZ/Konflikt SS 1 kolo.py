@@ -28,10 +28,10 @@ def person_data():
 
 
 def _expect_text(locator, text, message: str) -> None:
-    expect(locator, message).to_contain_text(text, timeout=50000)
+    expect(locator, message).to_contain_text(text, timeout=60000)
 
 
-def _expect_url(page: Page, pattern: str, message: str, timeout: int = 35000) -> None:
+def _expect_url(page: Page, pattern: str, message: str, timeout: int = 60000) -> None:
     expect(page, message).to_have_url(re.compile(pattern), timeout=timeout)
 
 

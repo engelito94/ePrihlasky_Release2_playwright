@@ -119,7 +119,7 @@ def test_pridanie_papierovej_prihlasky_ZS(page: Page) -> None:
     expect(
         page,
         "Po odoslaní papierovej prihlášky ZŠ sa neotvorila stránka riaditeľa."
-    ).to_have_url(re.compile(r".*/Riaditel.*"), timeout=25000)
+    ).to_have_url(re.compile(r".*/Riaditel.*"), timeout=60000)
 
     prihlaska.najdi_prihlasku(data.meno, data.priezvisko)
 

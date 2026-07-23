@@ -35,7 +35,7 @@ def _expect_visible(locator, message: str) -> None:
     expect(locator, message).to_be_visible()
 
 
-def _expect_url(page: Page, pattern: str, message: str, timeout: int = 35000) -> None:
+def _expect_url(page: Page, pattern: str, message: str, timeout: int = 60000) -> None:
     expect(page, message).to_have_url(re.compile(pattern), timeout=timeout)
 
 

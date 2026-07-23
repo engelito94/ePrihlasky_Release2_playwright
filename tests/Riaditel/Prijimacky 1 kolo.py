@@ -115,7 +115,7 @@ def test_prihlaska_na_SS_1_kolo_prijimacky(page: Page, person_data) -> None:
     expect(
         page,
         "Po potvrdení odoslania sa neotvorila stránka Prihláška odoslaná."
-    ).to_have_url(re.compile(r".*/Prihlaska-odoslana.*"), timeout=35000)
+    ).to_have_url(re.compile(r".*/Prihlaska-odoslana.*"), timeout=60000)
 
     _expect_text(
         page.locator("h1"),

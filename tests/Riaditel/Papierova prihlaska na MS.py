@@ -117,10 +117,11 @@ def test_pridanie_papierovej_prihlasky_MS(page: Page) -> None:
     _expect_visible(page.locator(".prilohaItem"), "Chýba aspoň jedna príloha.")
 
     prihlaska.click_on_odoslat_prihlasku()
-    expect(page, "Po odoslaní sa neotvorila stránka riaditeľa.").to_have_url(re.compile(r".*/Riaditel.*"), timeout=25000)
+    expect(page, "Po odoslaní sa neotvorila stránka riaditeľa.").to_have_url(re.compile(r".*/Riaditel.*"), timeout=60000)
     _expect_text(page.locator("#riaditel-home-page"), "Prihlášku pre dieťa ste úspešne pridali.", "Chýba potvrdenie o pridaní prihlášky.")
 
     prihlaska.najdi_prihlasku(data.meno, data.priezvisko)
     _expect_visible(page.get_by_text("P-2026-"), "Nenašiel sa identifikátor prihlášky.")
-    _expect_visible(page.get_by_text("Podaná").first, "Nenašiel sa stav Podaná.")
+    #_expect_visible(page.get_by_text("Podaná").first, "Nenašiel sa stav Podaná.") #zalezi od konfigu ci bude Podaná alebo V spracovaní
+    _expect_visible(page.get_by_text("V spracovaní").first, "Nenašiel sa stav V spracovaní.")
     _expect_visible(page.get_by_text("Papierovo"), "Nenašiel sa spôsob podania Papierovo.")

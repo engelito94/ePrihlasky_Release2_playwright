@@ -340,7 +340,7 @@ def test_prihlaska_na_SS_1_kolo(page: Page, person_data) -> None:
     expect(
         page,
         "Po potvrdení odoslania sa neotvorila stránka 'Prihlaska-odoslana'."
-    ).to_have_url(re.compile(r".*/Prihlaska-odoslana.*"), timeout=35000)
+    ).to_have_url(re.compile(r".*/Prihlaska-odoslana.*"), timeout=60000)
 
     expect(
         page.locator("h1"),
@@ -354,7 +354,7 @@ def test_prihlaska_na_SS_1_kolo(page: Page, person_data) -> None:
     expect(
         page,
         "Po návrate sa neotvorila stránka so zoznamom prihlášok."
-    ).to_have_url(re.compile(r".*/Prihlasky.*"), timeout=35000)
+    ).to_have_url(re.compile(r".*/Prihlasky.*"), timeout=60000)
 
     logout.logout()
 

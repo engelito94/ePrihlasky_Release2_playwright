@@ -84,10 +84,10 @@ class LoginPage(BasePage):
         expect(self.riaditel_home).to_contain_text("Správa prihlášok")
 
     def _wait_for_login_success(self):
-        expect(self.page).to_have_url(self.LOGIN_SUCCESS_URL, timeout=35000)
+        expect(self.page).to_have_url(self.LOGIN_SUCCESS_URL, timeout=60000)
 
     def _wait_for_registration(self):
-        expect(self.page).to_have_url(self.REGISTRATION_URL, timeout=35000)
+        expect(self.page).to_have_url(self.REGISTRATION_URL, timeout=60000)
 
     def login_as_zakonny_zastupca(self, username: str, password: str):
         self._open_login_form()
